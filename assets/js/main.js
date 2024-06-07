@@ -1,8 +1,8 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     var emailValidado = false;
 
     // Event listener for the 'next' button
-    document.getElementById('next-btn').addEventListener('click', function() {
+    document.getElementById('next-btn').addEventListener('click', function () {
         var emailInput = document.getElementById('email').value;
         var senhaInput = document.getElementById('senha').value;
 
@@ -16,11 +16,11 @@ document.addEventListener("DOMContentLoaded", function() {
             // Validate email
             if (emailInput.trim() !== '') {
                 $.ajax({
-                    url: 'https://auth.estejaon.com.br/verify/email',
+                    url: 'http://localhost/api/verify/email',
                     type: 'POST',
                     data: { email: emailInput },
                     dataType: 'json',
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
                             // Handle successful email verification
                             emailValidado = true;
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             errorEmail.classList.add('block');
                         }
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         // Handle AJAX error
                         console.error("Error verifying email:", error);
                         alert("Erro ao verificar o e-mail: " + error);
@@ -62,21 +62,21 @@ document.addEventListener("DOMContentLoaded", function() {
             // Email validation already done, check password
             if (senhaInput.trim() !== '') {
                 $.ajax({
-                    url: 'https://auth.estejaon.com.br/verify/password',
+                    url: 'http://localhost/api/verify/password',
                     type: 'POST',
                     data: { email: emailInput, senha: senhaInput },
                     dataType: 'json',
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
                             // Handle successful login
-                             window.location.href = 'https://accounts.estejaon.com.br/?token=' + encodeURIComponent(response.token);
+                            window.location.href = 'https://accounts.estejaon.com.br/?token=' + encodeURIComponent(response.token);
                             // Redirect to profile page or handle as needed
                         } else {
                             // Handle invalid password
                             alert(response.error);
                         }
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         // Handle AJAX error
                         console.error("Error verifying password:", error);
                         alert("Erro ao verificar a senha: " + error);
@@ -85,65 +85,193 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
     });
-	
-var useBusiness = document.getElementById('useBusiness');
-        if (useBusiness) {
-            useBusiness.addEventListener('click', function() {
-                // Hide loginForm and show registerBusiness form
-                document.getElementById('loginForm').classList.add('hidden');
-                document.getElementById('registerBusiness').classList.remove('hidden');
-            });
-        }
-        
-        function checkRequiredFields(sectionId) {
-            var requiredFields = document.querySelectorAll('#' + sectionId + ' [required]');
-            var allFilled = true;
-            
-            requiredFields.forEach(function(field) {
-                if (!field.value.trim()) {
-                    allFilled = false;
-                    field.classList.add('border-red-300'); // Add red border for empty fields
-                } else {
-                    field.classList.remove('border-red-300'); // Remove red border if filled
-                }
-            });
-            
-            return allFilled;
-        }
 
-        var avanceBtn = document.getElementById('avanceBtn');
-        if (avanceBtn) {
-            avanceBtn.addEventListener('click', function() {
-                if (checkRequiredFields('j22jn')) {
-                    document.getElementById('j22jn').classList.add('hidden');
-                    document.getElementById('j22jn').classList.remove('block');
-                    document.getElementById('j23jn').classList.remove('hidden');
-                    document.getElementById('j23jn').classList.add('block');
-                } else {
-                    alert('Por favor, preencha todos os campos obrigatórios.');
-                }
-            });
-        }
 
-        var concluirBtn = document.getElementById('concluirBtn');
-        if (concluirBtn) {
-            concluirBtn.addEventListener('click', function() {
-                if (checkRequiredFields('j23jn')) {
-                    // Submit the form or perform desired action
-                    alert('Formulário concluído com sucesso!');
-                    // document.getElementById('registerBusiness').submit(); // Uncomment to submit the form
-                } else {
-                    alert('Por favor, preencha todos os campos obrigatórios.');
-                }
-            });
-        }
-	//
-	
+
+    var useBusiness = document.getElementById('useBusiness');
+    if (useBusiness) {
+        useBusiness.addEventListener('click', function () {
+            // Hide loginForm and show registerBusiness form
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerBusiness').classList.remove('hidden');
+        });
+    }
+
+    function checkRequiredFields(sectionId) {
+        var requiredFields = document.querySelectorAll('#' + sectionId + ' [required]');
+        var allFilled = true;
+
+        requiredFields.forEach(function (field) {
+            if (!field.value.trim()) {
+                allFilled = false;
+                field.classList.add('border-red-300'); // Add red border for empty fields
+            } else {
+                field.classList.remove('border-red-300'); // Remove red border if filled
+            }
+        });
+
+        return allFilled;
+    }
+
+    var avanceBtn = document.getElementById('avanceBtn');
+
+
+
+    if (avanceBtn) {
+        avanceBtn.addEventListener('click', function () {
+
+
+            if (checkRequiredFields('j22jn')) {
+                document.getElementById('j22jn').classList.add('hidden');
+                document.getElementById('j22jn').classList.remove('block');
+                document.getElementById('j23jn').classList.remove('hidden');
+                document.getElementById('j23jn').classList.add('block');
+            } else {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+            }
+        });
+    }
+
+    var concluirBtn = document.getElementById('concluirBtn');
+    if (concluirBtn) {
+        concluirBtn.addEventListener('click', function () {
+            if (checkRequiredFields('j23jn')) {
+                const nameInput = document.getElementById('name').value;
+                const surnameInput = document.getElementById('apelido').value;
+                const emailInput = document.getElementById('email_usuario').value;
+                const phoneInput = document.getElementById('telefone').value;
+                const emailSecondaryInput = document.getElementById('email-secundario').value;
+                const passwordInput = document.getElementById('senha-registro').value;
+                const passwordRepeatInput = document.getElementById('conf-senha').value;
+                const dayInput = document.getElementById('birthdaydia').value;
+                const monthInput = document.getElementById('birthdaymes').value;
+                const yearInput = document.getElementById('birthdayano').value;
+                const genderInput = document.getElementById('gender').value;
+
+                $.ajax({
+                    url: 'http://localhost/api/verify/register',
+                    type: 'POST',
+                    data: {
+                        nome: nameInput,
+                        apelido: surnameInput,
+                        email: emailInput,
+                        telefone: phoneInput,
+                        email_secundario: emailSecondaryInput,
+                        senha: passwordInput,
+                        conf_senha: passwordRepeatInput,
+                        dia: dayInput,
+                        mes: monthInput,
+                        ano: yearInput,
+                        genero: genderInput
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+
+                        } else {
+                            if (response.error) {
+
+                                if (Array.isArray(response.input_error)) {
+                                    response.input_error.forEach(function(inputErrorId) {
+                                        const inputError = document.getElementById(inputErrorId);
+                                        if (inputError) {
+                                            inputError.classList.add('border-red-300');
+                                        }
+                                    })
+                                } else {
+                                    const inputError = document.getElementById("" + response.input_error + "");
+                                    inputError.classList.add('border-red-300');
+                                }
+    
+                                if (response.back) {
+
+                                    document.getElementById('j22jn').classList.add('block');
+                                    document.getElementById('j22jn').classList.remove('hidden');
+                                    document.getElementById('j23jn').classList.remove('block');
+                                    document.getElementById('j23jn').classList.add('hidden');
+
+
+                                    switch (response.type) {
+                                        case 'nome':
+                                            const errorNome = document.getElementById('errorNome');
+                                            errorNome.textContent = "" + response.message + "";
+                                            errorNome.classList.remove('hidden');
+                                            break;
+                                        
+                                        case 'apelido':
+                                            const errorApelido = document.getElementById('errorApelido');
+                                            errorApelido.textContent = "" + response.message + "";
+                                            errorApelido.classList.remove('hidden');
+                                            break;
+                                            
+                                        case 'email':
+                                            const errorEmail = document.getElementById('errorEmail');
+                                            errorEmail.textContent = "" + response.message + "";
+                                            errorEmail.classList.remove('hidden');
+                                            break;
+                                    }
+
+                                    return;
+
+                                }
+                                
+                                switch(response.type) {
+                                    case 'telefone':
+                                        const errorTelefone = document.getElementById('errorTelefone');
+                                        errorTelefone.textContent = "" + response.message + "";
+                                        errorTelefone.classList.remove('hidden');
+                                        break;
+                                    case 'email_secundario':
+                                        const errorEmailSecundario = document.getElementById('errorEmailSecundario');
+                                        errorEmailSecundario.textContent = "" + response.message + "";
+                                        errorEmailSecundario.classList.remove('hidden');
+                                        break;
+                                    case 'senha':
+                                        const errorSenha = document.getElementById('errorSenha');
+                                        errorSenha.textContent = "" + response.message + "";
+                                        errorSenha.classList.remove('hidden');
+                                        break;
+                                    case 'conf-senha':
+                                        const errorConfSenha = document.getElementById('errorConfSenha');
+                                        errorConfSenha.textContent = "" + response.message + "";
+                                        errorConfSenha.classList.remove('hidden');
+                                        break;
+                                    case 'senha-diferente':
+                                        alert(response.message);
+                                        break;
+                                    case 'nascimento':
+                                        alert(response.message);
+                                        break;
+                                    case 'genero':
+                                        const errorGenero = document.getElementById('errorGenero');
+                                        errorGenero.textContent = "" + response.message + "";
+                                        errorGenero.classList.remove('hidden');
+                                        break;
+                                }
+                            }
+
+
+
+                            return;
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Erro: " + error);
+                    }
+                });
+                // document.getElementById('registerBusiness').submit(); // Uncomment to submit the form
+            } else {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+            }
+        });
+    }
+    //
+
 
     // Event listener for showing/hiding password
     var checkElement = document.getElementById('check');
     if (checkElement) {
-        checkElement.addEventListener('change', function() {
+        checkElement.addEventListener('change', function () {
             var senhaInput = document.getElementById('senha');
             var mostrarSenha = this.checked;
             senhaInput.type = mostrarSenha ? 'text' : 'password';
@@ -154,12 +282,12 @@ var useBusiness = document.getElementById('useBusiness');
     const createAccountBtn = document.getElementById('createAccount');
     const dropdown = document.querySelector('.dropdown');
     if (createAccountBtn && dropdown) {
-        createAccountBtn.addEventListener('click', function(event) {
+        createAccountBtn.addEventListener('click', function (event) {
             event.stopPropagation();
             dropdown.classList.toggle('hidden');
         });
 
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             if (!dropdown.contains(event.target) && event.target !== createAccountBtn && dropdown.classList.contains('block')) {
                 dropdown.classList.add('hidden');
             }
