@@ -1,3 +1,8 @@
+<?php
+require_once(__DIR__ . "/geral.php");
+
+$Functions::Session("desconectado");
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -89,12 +94,12 @@
 								<div class="flex flex-col w-full">
 									<label class="text-[14px] pb-2 px-1 font-medium">Nome</label>
 									<input type="text" class="form-control !outline-none py-2.5 text-[13px] text-[#47494d] font-medium shadow-none !rounded border-2 border-[#eceeef] focus:border-[#000131]" 
-									value="Eduarda">
+									value="<?= $usuario['nome'] ?>">
 								</div>
 								<div class="flex flex-col w-full">
-									<label class="text-[14px] pb-2 px-1 font-medium">Sobrenome</label>
+									<label class="text-[14px] pb-2 px-1 font-medium">Apelido</label>
 									<input type="text" class="form-control !outline-none py-2.5 text-[13px] text-[#47494d] font-medium shadow-none !rounded border-2 border-[#eceeef] focus:border-[#000131]" 
-									value="Marra">
+									value="<?= $usuario['apelido'] ?>">
 								</div>
 							</div>
 							<div class="flex lg:flex-row flex-col justify-between gap-3 my-2.5">

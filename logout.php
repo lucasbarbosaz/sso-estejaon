@@ -1,5 +1,5 @@
 <?php
-    require_once(__DIR__ ."/../geral.php");
+    require_once(__DIR__ ."/geral.php");
  
     if (!empty($_GET['token'])) {
         $token = $_GET['token'];
@@ -10,5 +10,5 @@
     $Functions::deleteToken($token);
     session_destroy();
 
-    header('Location: index.php');
+    Redirect(SITE_URL);
 ?>

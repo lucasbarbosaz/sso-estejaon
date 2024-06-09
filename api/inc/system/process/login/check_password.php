@@ -1,6 +1,6 @@
 <?php
 // Inclui o arquivo de configuração
-require_once(__DIR__ . '/../../config.php');
+require_once(__DIR__ . '/../../../../../geral.php');
 
 // Define a codificação como UTF-8
 header('Content-Type: application/json; charset=utf-8');
@@ -43,7 +43,7 @@ $ipAddress = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR'];
 
 try {
     // Prepara e executa a consulta SQL para obter o hash da senha do usuário
-    $stmt = $pdo->prepare("SELECT senha FROM usuarios WHERE email = ?");
+    $stmt = $db->prepare("SELECT senha FROM usuarios WHERE email = ?");
     $stmt->execute([$email]);
     $hashSenha = $stmt->fetchColumn();
 
@@ -82,7 +82,7 @@ try {
         $token = $encodedHeader . '.' . $encodedBody . '.' . $encodedSignature;
 
         // Salva no banco de dados
-        $stmt = $pdo->prepare("UPDATE usuarios SET token = ?, ip_recente = ? WHERE email = ?");
+        $stmt = $db->prepare("UPDATE usuarios SET token = ?, ip_recente = ? WHERE email = ?");
         $stmt->execute([$token, $ipAddress, $email]);	
 		
         // Retorna o token JWT na resposta JSON

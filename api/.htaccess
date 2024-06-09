@@ -4,3 +4,4 @@ RewriteBase /api/inc/system/process/login/
 RewriteRule ^verify/email$ check_email.php [L]
 RewriteRule ^verify/password$ check_password.php [L]
 RewriteRule ^verify/register$ check_register.php [L]
+RewriteRule ^verify/security$ security.php [L]

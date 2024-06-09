@@ -1,5 +1,6 @@
 <?php
+require_once(__DIR__ . "/geral.php");
 
-header("Location: login.php" );
+header('Location: ' . LOGIN_URL );
 exit;
 ?>

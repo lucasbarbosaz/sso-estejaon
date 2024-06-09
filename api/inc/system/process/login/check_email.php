@@ -1,6 +1,7 @@
 <?php
 // Inclui o arquivo de configuração
-require_once(__DIR__ . '/../../config.php');
+require_once(__DIR__ . '/../../../../../geral.php');
+
 
 // Define a codificação como UTF-8
 header('Content-Type: application/json; charset=utf-8');
@@ -47,7 +48,7 @@ if (extract($_POST)) {
 
     try {
         // Prepara e executa a consulta SQL para verificar se o email existe
-        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
+        $stmt = $db->prepare("SELECT * FROM usuarios WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 

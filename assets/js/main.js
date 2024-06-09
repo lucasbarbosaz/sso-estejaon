@@ -136,6 +136,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (concluirBtn) {
         concluirBtn.addEventListener('click', function () {
             if (checkRequiredFields('j23jn')) {
+                var queryString = window.location.search;
+
+
                 const nameInput = document.getElementById('name').value;
                 const surnameInput = document.getElementById('apelido').value;
                 const emailInput = document.getElementById('email_usuario').value;
@@ -149,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const genderInput = document.getElementById('gender').value;
 
                 $.ajax({
-                    url: 'http://localhost/api/verify/register',
+                    url: 'http://localhost/api/verify/register' + queryString,
                     type: 'POST',
                     data: {
                         nome: nameInput,
@@ -167,22 +170,28 @@ document.addEventListener("DOMContentLoaded", function () {
                     dataType: 'json',
                     success: function (response) {
                         if (response.success) {
-
+                            if (response.redirect) {
+                                window.location.href = response.location;
+                            } else {
+                                window.location.href = 'conta.php';
+                            }
                         } else {
                             if (response.error) {
 
-                                if (Array.isArray(response.input_error)) {
-                                    response.input_error.forEach(function(inputErrorId) {
-                                        const inputError = document.getElementById(inputErrorId);
-                                        if (inputError) {
-                                            inputError.classList.add('border-red-300');
-                                        }
-                                    })
-                                } else {
-                                    const inputError = document.getElementById("" + response.input_error + "");
-                                    inputError.classList.add('border-red-300');
+                                if (response.input_error) {
+                                    if (Array.isArray(response.input_error)) {
+                                        response.input_error.forEach(function (inputErrorId) {
+                                            const inputError = document.getElementById(inputErrorId);
+                                            if (inputError) {
+                                                inputError.classList.add('border-red-300');
+                                            }
+                                        })
+                                    } else {
+                                        const inputError = document.getElementById("" + response.input_error + "");
+                                        inputError.classList.add('border-red-300');
+                                    }
                                 }
-    
+
                                 if (response.back) {
 
                                     document.getElementById('j22jn').classList.add('block');
@@ -197,13 +206,13 @@ document.addEventListener("DOMContentLoaded", function () {
                                             errorNome.textContent = "" + response.message + "";
                                             errorNome.classList.remove('hidden');
                                             break;
-                                        
+
                                         case 'apelido':
                                             const errorApelido = document.getElementById('errorApelido');
                                             errorApelido.textContent = "" + response.message + "";
                                             errorApelido.classList.remove('hidden');
                                             break;
-                                            
+
                                         case 'email':
                                             const errorEmail = document.getElementById('errorEmail');
                                             errorEmail.textContent = "" + response.message + "";
@@ -214,8 +223,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                     return;
 
                                 }
-                                
-                                switch(response.type) {
+
+                                switch (response.type) {
                                     case 'telefone':
                                         const errorTelefone = document.getElementById('errorTelefone');
                                         errorTelefone.textContent = "" + response.message + "";
@@ -247,10 +256,21 @@ document.addEventListener("DOMContentLoaded", function () {
                                         errorGenero.textContent = "" + response.message + "";
                                         errorGenero.classList.remove('hidden');
                                         break;
+                                    case 'url_blocked':
+                                        $.ajax({
+                                            url: 'http://localhost/api/verify/security?redirect_blocked=' + response.url + "",
+                                            type: 'GET',
+                                            dataType: 'json',
+                                            success: function (response) {
+                                                window.location.href = "/";
+                                            },
+                                            error: function (xhr, status, error) {
+                                                alert("Erro: " + error);
+                                            }
+                                        })
+                                        break;
                                 }
                             }
-
-
 
                             return;
                         }

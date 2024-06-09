@@ -6,15 +6,6 @@ define('DB_NAME', 'sso_db');
 define('DB_USER', 'root');
 define('DB_PASSWORD', "");
 
-// Defina constantes para o site
-define('SITE_NAME', 'EstejaON');
-define('SITE_URL', 'http://localhost');
-define('LOGIN_URL', 'https://localhost');
-define('MAX_TENTATIVAS_LOGIN', 5); // Define o número máximo de tentativas de login
-define('TEMPO_BLOQUEIO_LOGIN', 300); // Define o tempo de bloqueio em segundos (300 segundos = 5 minutos)
-
-// Define os domínios permitidos como uma constante
-define('EMAILS_PERMITIDOS', array('@gmail.com', '@outlook.com', '@hotmail.com', '@yahoo.com', '@icloud.com', '@protonmail.com'));
 
 // Configuração da conexão PDO
 $options = [

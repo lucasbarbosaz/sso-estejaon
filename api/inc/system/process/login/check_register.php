@@ -1,22 +1,15 @@
 <?php
-require_once(__DIR__ . '/../../config.php');
-require_once(__DIR__ . '/../../functions.php');
+require_once (__DIR__ . '/../../../../../geral.php');
 
 // Define a codificação como UTF-8
 header('Content-Type: application/json; charset=utf-8');
 
-// Habilita o CORS (Cross-Origin Resource Sharing)
-header("Access-Control-Allow-Origin: " . LOGIN_URL);
-header("Access-Control-Allow-Methods: POST");
-header("Access-Control-Allow-Headers: Content-Type");
-
-
-
 if (extract($_POST)) {
     $response = array();
 
-    $nome = (isset($_POST['nome'])) ? Filter('nome', $_POST['nome']) : '';
-    $apelido = (isset($_POST['apelido'])) ? Filter('nome', $_POST['apelido']) : '';
+
+    $nome = (isset($_POST['nome'])) ? htmlspecialchars($_POST['nome']) : '';
+    $apelido = (isset($_POST['apelido'])) ? htmlspecialchars($_POST['apelido']) : '';
     $email = (isset($_POST['email'])) ? $_POST['email'] : '';
     $telefone = (isset($_POST['telefone'])) ? $_POST['telefone'] : '';
     $email_secundario = (isset($_POST['email_secundario'])) ? $_POST['email_secundario'] : ' ';
@@ -27,11 +20,11 @@ if (extract($_POST)) {
     $ano = (isset($_POST['ano'])) ? $_POST['ano'] : '';
     $genero = (isset($_POST['genero'])) ? $_POST['genero'] : '';
 
-    $email_existe = $pdo->prepare("SELECT email FROM usuarios WHERE email = ?");
+    $email_existe = $db->prepare("SELECT email FROM usuarios WHERE email = ?");
     $email_existe->bindValue(1, $email);
     $email_existe->execute();
 
-    $email_secundario_existe = $pdo->prepare("SELECT email FROM usuarios WHERE email = ?");
+    $email_secundario_existe = $db->prepare("SELECT email FROM usuarios WHERE email = ?");
     $email_secundario_existe->bindValue(1, $email_secundario);
     $email_secundario_existe->execute();
 
@@ -73,14 +66,15 @@ if (extract($_POST)) {
         $response['input_error'] = "name";
         echo json_encode($response);
         exit;
-    } else if (Validate('nome', $nome) !== true) {
+    } else if ($Functions::Validate('nome', $nome) !== true) {
         $response['error'] = true;
         $response['back'] = true;
         $response['message'] = "Insira um nome válido.";
+        $response['input_error'] = "name";
         $response['type'] = "nome";
         echo json_encode($response);
         exit;
-    } else if (Validate('nome', $apelido) !== true) {
+    } else if ($Functions::Validate('nome', $apelido) !== true) {
         $response['error'] = true;
         $response['back'] = true;
         $response['message'] = "Insira um apelido válido.";
@@ -113,14 +107,11 @@ if (extract($_POST)) {
         echo json_encode($response);
         exit;
     } else if ($email_existe->rowCount() > 0) {
-        $response['error'] = "Esse e-mail já foi cadastrado na EstejaON";
-        echo json_encode($response);
-        exit;
-    } else if (!formatarNumeroCelular($telefone)) {
         $response['error'] = true;
-        $response['type'] = "telefone";
-        $response['message'] = "Insira um número de telefone válido.";
-        $response['input_error'] = "telefone";
+        $response['back'] = true;
+        $response['type'] = "email";
+        $response['message'] = "Esse e-mail já foi cadastrado na EstejaON";
+        $response['input_error'] = "email_usuario";
         echo json_encode($response);
         exit;
     } else if ($email_secundario_existe->rowCount() > 0) {
@@ -129,6 +120,20 @@ if (extract($_POST)) {
         $response['message'] = "Esse e-mail já está sendo utilizado";
         $response['input_error'] = "email-secundario";
         echo json_encode($response);
+    } else if ($email_secundario === $email) {
+        $response['error'] = true;
+        $response['type'] = "email_secundario";
+        $response['message'] = "Esse e-mail já está sendo utilizado como principal.";
+        $response['input_error'] = "email-secundario";
+        echo json_encode($response);
+        exit;
+    } else if (!$Functions::formatarNumeroCelular($telefone)) {
+        $response['error'] = true;
+        $response['type'] = "telefone";
+        $response['message'] = "Insira um número de telefone válido.";
+        $response['input_error'] = "telefone";
+        echo json_encode($response);
+        exit;
     } else if (!isset($senha) || empty($senha)) {
         $response['error'] = true;
         $response['type'] = "senha";
@@ -157,11 +162,11 @@ if (extract($_POST)) {
         $response['input_error'] = "conf-senha";
         echo json_encode($response);
         exit;
-    } else if (!empty($dia) && !empty($mes) && !empty($ano)) {
+    } else if (empty($dia) && empty($mes) && empty($ano)) {
         $response['error'] = true;
         $response['type'] = 'nascimento';
         $response['message'] = "Por favor, preencha todos os campos de data.";
-        $response['input_error'] = ["birthdaydia","birthdaymes","birthdayano"];
+        $response['input_error'] = ["birthdaydia", "birthdaymes", "birthdayano"];
         echo json_encode($response);
         exit;
     } else if ($idade < 18) {
@@ -177,9 +182,142 @@ if (extract($_POST)) {
         exit;
     } else {
 
-        // a finalizar
+        
+        if (isset($_GET['redirect_url'])) {
+            $appUrl = $_GET['redirect_url'];
+            
+            
+            $obterSitesPermitidos = $db->prepare("SELECT url FROM host");
+            $obterSitesPermitidos->execute();
+            $urlsPermitidas = $obterSitesPermitidos->fetchAll(PDO::FETCH_COLUMN);
 
-        $response['success'] = true;
-        echo json_encode($response);
+            $obterHost = $Functions::getHostFromUrl($appUrl); //remover o path e o scheme
+
+            if (in_array($obterHost, $urlsPermitidas)) {
+
+                if (substr($appUrl, 0, 4) != "http") {
+                    $source = parse_url("http://" . $appUrl);
+                } else {
+                    $source = parse_url($appUrl);
+                }
+
+                if (isset($source['host'])) {
+                    $senha_bcrypt = password_hash($senha, PASSWORD_BCRYPT);
+   
+                    $inserir_conta = $db->prepare("INSERT INTO usuarios (nome, apelido, email, email_secundario, telefone, senha, data_nascimento, genero, ultimo_ip, registro_ip) VALUES (?,?,?,?,?,?,?,?,?,?)");
+                    $inserir_conta->bindValue(1, $nome);
+                    $inserir_conta->bindValue(2, $apelido);
+                    $inserir_conta->bindValue(3, $email);
+                    $inserir_conta->bindValue(4, $email_secundario);
+                    $inserir_conta->bindValue(5, $Functions::formatarNumeroCelular($telefone));
+                    $inserir_conta->bindValue(6, $senha_bcrypt);
+                    $inserir_conta->bindValue(7, $data);
+                    $inserir_conta->bindValue(8, $genero);
+                    $inserir_conta->bindValue(9, $Functions::IP());
+                    $inserir_conta->bindValue(10, $Functions::IP());
+                    $inserir_conta->execute();
+                    $conta_id = $db->lastInsertId();
+
+                    $header = [
+                        'alg' => 'HS256',
+                        'typ' => 'JWT'
+                    ];
+
+                    $payload = [
+                        'iat' => time(),
+                        'exp' => time() + (30 * 24 * 60 * 60), // expira em 30 dias
+                        'sub' => $conta_id
+                    ];
+
+                    $token = $JWT::generateJWT($header, $payload);
+
+                    $scheme = isset($source['scheme']) ? $source['scheme'] : 'http';
+                    $host = $source['host'];
+                    $path = isset($source['path']) ? $source['path'] : '';
+
+                    $target = $scheme . '://' . $host . $path;
+
+                    $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
+                    $salvarToken->bindValue(1, $token);
+                    $salvarToken->bindValue(2, $conta_id);
+                    $salvarToken->execute();
+
+                    $_SESSION['token'] = $token;
+                    $_SESSION['id'] = $conta_id;
+                    $_SESSION['nome'] = $nome;
+                    $_SESSION['senha'] = $senha;
+                    $_SESSION['apelido'] = $apelido;
+                    $_SESSION['email'] = $email;
+                    $_SESSION['email_secundario'] = $email_secundario;
+                    $_SESSION['telefone'] = $telefone;
+                    
+                    $response['success'] = true;
+                    $response['redirect'] = true;
+                    $response['location'] = $target.'?token='.$token;
+                    echo json_encode($response);
+
+                }
+
+
+            } else {
+                $response['error'] = true;
+                $response['url'] = "$obterHost";
+                $response['type'] = 'url_blocked';
+                echo json_encode($response);
+            }
+        } else {
+
+            $senha_bcrypt = password_hash($senha, PASSWORD_BCRYPT);
+
+            $inserir_conta = $db->prepare("INSERT INTO usuarios (nome, apelido, email, email_secundario, telefone, senha, data_nascimento, genero, ultimo_ip, registro_ip) VALUES (?,?,?,?,?,?,?,?,?,?)");
+            $inserir_conta->bindValue(1, $nome);
+            $inserir_conta->bindValue(2, $apelido);
+            $inserir_conta->bindValue(3, $email);
+            $inserir_conta->bindValue(4, $email_secundario);
+            $inserir_conta->bindValue(5, $Functions::formatarNumeroCelular($telefone));
+            $inserir_conta->bindValue(6, $senha_bcrypt);
+            $inserir_conta->bindValue(7, $data);
+            $inserir_conta->bindValue(8, $genero);
+            $inserir_conta->bindValue(9, $Functions::IP());
+            $inserir_conta->bindValue(10, $Functions::IP());
+            $inserir_conta->execute();
+
+            $conta_id = $db->lastInsertId();
+
+            $header = [
+                'alg' => 'HS256',
+                'typ' => 'JWT'
+            ];
+
+            $payload = [
+                'iat' => time(),
+                'exp' => time() + (30 * 24 * 60 * 60), // expira em 30 dias
+                'sub' => $conta_id
+            ];
+
+            $token = $JWT::generateJWT($header, $payload);
+
+            $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
+            $salvarToken->bindValue(1, $token);
+            $salvarToken->bindValue(2, $conta_id);
+            $salvarToken->execute();
+
+
+            $_SESSION['token'] = $token;
+            $_SESSION['id'] = $conta_id;
+            $_SESSION['nome'] = $nome;
+            $_SESSION['senha'] = $senha;
+            $_SESSION['apelido'] = $apelido;
+            $_SESSION['email'] = $email;
+            $_SESSION['email_secundario'] = $email_secundario;
+            $_SESSION['telefone'] = $telefone;
+
+            $response['success'] = true;
+            echo json_encode($response);
+        }
     }
+} else {
+    echo 'Cannot get ' . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) . '.';
 }
+?>
+ 
