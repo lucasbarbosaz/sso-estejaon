@@ -1,11 +1,6 @@
 <?php
 require_once(__DIR__ ."/geral.php");
 
-if (isset($_SESSION['id'])) {
-  echo "OI";
-  header('Location: conta.php');
-}
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -46,13 +41,13 @@ if (isset($_SESSION['id'])) {
       <div class="relative flex flex-col my-2 w-full !z-10">
         <form method="POST" id="loginForm" class="block">
           <div class="relative my-1" id="s2jn">
-            <input type="email" id="email" name="email" class="w-full form-control !outline-none pt-[1.03rem] p-3 text-[13px] text-[#47494d] font-medium shadow-none rounded-md border-2 border-[#eceeef] focus:border-[#000131]" onfocus="document.getElementById('labelEmail').classList.add('!top-[-5px]', '!text-[#000131]')" onblur="if(this.value==''){document.getElementById('labelEmail').classList.remove('!top-[-5px]', '!text-[#000131]')}" required>
+            <input type="email" id="email-login" name="email-login" class="w-full form-control !outline-none pt-[1.03rem] p-3 text-[13px] text-[#47494d] font-medium shadow-none rounded-md border-2 border-[#eceeef] focus:border-[#000131]" onfocus="document.getElementById('labelEmail').classList.add('!top-[-5px]', '!text-[#000131]')" onblur="if(this.value==''){document.getElementById('labelEmail').classList.remove('!top-[-5px]', '!text-[#000131]')}" required>
             <label for="email" id="labelEmail" class="absolute left-4 top-6 px-2 bg-white transform -translate-y-1 text-[12px] text-gray-400 transition-all duration-300 origin-0 select-none">E-mail</label>
             <!-- Validation -->
             <div id="errorEmail-login" class="hidden select-none text-red-500 font-medium text-[13px] px-1 my-1">Digite um e-mail válido!</div>
           </div>
           <div class="hidden relative my-1" id="s0jn">
-            <input type="password" id="senha" name="senha" class="w-full form-control !outline-none pt-[1.03rem] p-3 text-[13px] text-[#47494d] font-medium shadow-none rounded-md border-2 border-[#eceeef] focus:border-[#000131]" onfocus="document.getElementById('labelSenha').classList.add('!top-[-5px]', '!text-[#000131]')" onblur="if(this.value==''){document.getElementById('labelSenha').classList.remove('!top-[-5px]', '!text-[#000131]')}" required>
+            <input type="password" id="senha-login" name="senha-login" class="w-full form-control !outline-none pt-[1.03rem] p-3 text-[13px] text-[#47494d] font-medium shadow-none rounded-md border-2 border-[#eceeef] focus:border-[#000131]" onfocus="document.getElementById('labelSenha').classList.add('!top-[-5px]', '!text-[#000131]')" onblur="if(this.value==''){document.getElementById('labelSenha').classList.remove('!top-[-5px]', '!text-[#000131]')}" required>
             <label for="senha" id="labelSenha" class="absolute left-4 top-6 px-2 bg-white transform -translate-y-1 text-[12px] text-gray-400 transition-all duration-300 origin-0 select-none">Senha</label>
             <!-- Validation -->
             <div id="errorSenha-login" class="select-none hidden text-red-500 font-medium text-[13px] px-1 my-1">Você precisa digitar um e-mail válido!</div>

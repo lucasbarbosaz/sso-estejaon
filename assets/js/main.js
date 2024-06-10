@@ -1,29 +1,26 @@
 document.addEventListener("DOMContentLoaded", function () {
     var emailValidado = false;
 
-    // Event listener for the 'next' button
+    // login
     document.getElementById('next-btn').addEventListener('click', function () {
-        var emailInput = document.getElementById('email').value;
-        var senhaInput = document.getElementById('senha').value;
+        var emailInput = document.getElementById('email-login').value;
 
-        // Validations
-        var errorEmail = document.getElementById('errorEmail');
-        var emailInputs = document.getElementById('email');
-        var emailLabel = document.getElementById('labelEmail');
+        var errorEmailLogin = document.getElementById('errorEmail-login');
 
-        // Check if email validation is not yet done
         if (!emailValidado) {
-            // Validate email
             if (emailInput.trim() !== '') {
                 $.ajax({
-                    url: 'http://localhost/api/verify/email',
+                    url: 'http://localhost/api/verify/login',
                     type: 'POST',
-                    data: { email: emailInput },
+                    data: {
+                        type: 'email',
+                        email: emailInput
+                    },
                     dataType: 'json',
                     success: function (response) {
                         if (response.success) {
-                            // Handle successful email verification
                             emailValidado = true;
+
                             var emailSpan = document.getElementById('skj2');
                             emailSpan.textContent = emailInput;
 
@@ -31,57 +28,70 @@ document.addEventListener("DOMContentLoaded", function () {
                             var senhaDiv = document.getElementById('s0jn');
                             var emailDiv = document.getElementById('s2jn');
                             var forgotPassword = document.getElementById('sjw0');
-                            var blockPassword = document.getElementById('sjw2');
                             var textAccount = document.getElementById('s9nk');
                             var emailAccount = document.getElementById('b3jk');
                             emailDiv.classList.add('hidden');
                             senhaDiv.classList.remove('hidden');
                             forgotPassword.classList.add('hidden');
-                            blockPassword.classList.remove('hidden');
                             textAccount.classList.add('hidden');
                             emailAccount.classList.remove('hidden');
-                        } else {
-                            // Handle invalid email
-                            emailInputs.classList.remove('border-[#eceeef]');
-                            emailInputs.classList.add('border-red-300');
-                            emailInputs.classList.add('text-red-600');
-                            emailLabel.classList.remove('text-gray-400');
-                            emailLabel.classList.add('!text-red-600');
-                            errorEmail.classList.remove('hidden');
-                            errorEmail.classList.add('block');
                         }
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle AJAX error
-                        console.error("Error verifying email:", error);
-                        alert("Erro ao verificar o e-mail: " + error);
+
+                        if (response.error) {
+                            if (response.input_error) {
+                                const inputError = document.getElementById("" + response.input_error + "");
+                                inputError.classList.add('border-red-300');
+                            }
+
+                            errorEmailLogin.textContent = "" + response.message + "";
+                            errorEmailLogin.classList.remove('hidden');
+                        }
+                    }, error: function (xhr, status, error) {
+                        console.log("Erro inesperado: " + error);
                     }
-                });
+                })
             }
         } else {
-            // Email validation already done, check password
+            var queryString = window.location.search;
+
+
+            var emailInput = document.getElementById('email-login').value;
+            var senhaInput = document.getElementById('senha-login').value;
+            var errorSenha = document.getElementById('errorSenha-login');
+
             if (senhaInput.trim() !== '') {
                 $.ajax({
-                    url: 'http://localhost/api/verify/password',
+                    url: 'http://localhost/api/verify/login' + queryString,
                     type: 'POST',
-                    data: { email: emailInput, senha: senhaInput },
+                    data: {
+                        type: 'senha',
+                        email: emailInput,
+                        senha: senhaInput
+                    },
                     dataType: 'json',
                     success: function (response) {
                         if (response.success) {
-                            // Handle successful login
-                            window.location.href = 'https://accounts.estejaon.com.br/?token=' + encodeURIComponent(response.token);
-                            // Redirect to profile page or handle as needed
-                        } else {
-                            // Handle invalid password
-                            alert(response.error);
+                            if (response.redirect) {
+                                window.location.href = response.location;
+                            } else {
+                                console.log(response);
+                                window.location.href = 'conta.php';
+                            }
                         }
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle AJAX error
-                        console.error("Error verifying password:", error);
-                        alert("Erro ao verificar a senha: " + error);
+
+                        if (response.error) {
+                            if (response.input_error) {
+                                const inputError = document.getElementById("" + response.input_error + "");
+                                inputError.classList.add('border-red-300');
+                            }
+
+                            errorSenha.textContent = "" + response.message + "";
+                            errorSenha.classList.remove('hidden');
+                        }
+                    }, error: function (xhr, status, error) {
+                        console.log("Erro inesperado: " + error);
                     }
-                });
+                })
             }
         }
     });
@@ -132,6 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    //registro
     var concluirBtn = document.getElementById('concluirBtn');
     if (concluirBtn) {
         concluirBtn.addEventListener('click', function () {

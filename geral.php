@@ -6,13 +6,17 @@ ini_set('display_startup_errors', 1);
 
 
 if (!isset($_SESSION)) {
+    
     $lifetime = 30 * 24 * 60 * 60; //30 dias de sessão ativa
-
+    
     ini_set('session.cookie_lifetime', $lifetime);
 
     session_start();
 
+
 }
+
+
 
 require_once (__DIR__ . '/api/inc/system/class/class.core.php');
 require_once (__DIR__ . '/api/inc/system/functions.php');
@@ -21,8 +25,8 @@ define('SECRETKEY', "mxSdlxmaSdkxnasdjknxksd");
 define('EMAILS_PERMITIDOS', array('@gmail.com', '@outlook.com', '@hotmail.com', '@yahoo.com', '@icloud.com', '@protonmail.com'));
 // Defina constantes para o site
 define('SITE_NAME', 'EstejaON');
-define('SITE_URL', 'http://127.0.0.1');
-define('LOGIN_URL', 'http://127.0.0.1/login.php');
+define('SITE_URL', 'http://localhost');
+define('LOGIN_URL', 'http://localhost/login.php');
 define('MAX_TENTATIVAS_LOGIN', 5); // Define o número máximo de tentativas de login
 define('TEMPO_BLOQUEIO_LOGIN', 300); // Define o tempo de bloqueio em segundos (300 segundos = 5 minutos)
 
@@ -66,7 +70,11 @@ if (isset($_SESSION['id']) && isset($_SESSION['senha']) && isset($_SESSION['toke
 }
 
 header("Content-Type: text/html; charset=utf-8", true);
+header("Access-Control-Allow-Origin: " . SITE_URL);
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Headers: Content-Type");
 setlocale(LC_ALL, 'pt_BR', 'pt_BR.iso-8859-15', 'portuguese');
 date_default_timezone_set('America/Sao_Paulo');
+
 
 ?>
