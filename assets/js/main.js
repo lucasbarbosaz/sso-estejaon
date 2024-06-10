@@ -88,6 +88,22 @@ document.addEventListener("DOMContentLoaded", function () {
                             errorSenha.textContent = "" + response.message + "";
                             errorSenha.classList.remove('hidden');
                         }
+
+                        if (response.type) {
+                            if (response.type == "url_blocked") {
+                                $.ajax({
+                                    url: 'http://localhost/api/verify/security?redirect_blocked=' + response.url + "",
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    success: function (response) {
+                                        window.location.href = "/";
+                                    },
+                                    error: function (xhr, status, error) {
+                                        alert("Erro: " + error);
+                                    }
+                                })
+                            }
+                        }
                     }, error: function (xhr, status, error) {
                         console.log("Erro inesperado: " + error);
                     }

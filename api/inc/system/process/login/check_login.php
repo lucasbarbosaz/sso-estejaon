@@ -138,6 +138,11 @@ if (extract(($_POST))) {
                             $response['location'] = $target . '?token=' . $token;
                             echo json_encode($response);
                         }
+                    } else {
+                        $response['error'] = true;
+                        $response['url'] = "$obterHost";
+                        $response['type'] = 'url_blocked';
+                        echo json_encode($response);
                     }
                 } else {
 
