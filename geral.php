@@ -19,8 +19,8 @@ if (!isset($_SESSION)) {
 
 define('DIR', __DIR__);
 
-require_once (DIR . '/api/inc/system/class/class.core.php');
-require_once (DIR . '/api/inc/system/functions.php');
+require_once (DIR . '/inc/system/class/class.core.php');
+require_once (DIR . '/inc/system/functions.php');
 
 define('EMAILS_PERMITIDOS', array('@gmail.com', '@outlook.com', '@hotmail.com', '@yahoo.com', '@icloud.com', '@protonmail.com'));
 // Defina constantes para o site
