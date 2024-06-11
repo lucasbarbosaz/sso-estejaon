@@ -53,7 +53,7 @@ require_once(__DIR__ ."/geral.php");
             <div id="errorSenha-login" class="select-none hidden text-red-500 font-medium text-[13px] px-1 my-1">Você precisa digitar um e-mail válido!</div>
           </div>
           <div class="flex flex-col px-1 my-2">
-            <a href="" id="sjw0" class="mb-3 text-[13px] hover:bg-[#0001310a] w-fit rounded-lg cursor-pointer font-semibold select-none">Esqueceu sua senha?</a>
+            <a href="/esqueceu.php" id="sjw0" class="mb-3 text-[13px] hover:bg-[#0001310a] w-fit rounded-lg cursor-pointer font-semibold select-none">Esqueceu sua senha?</a>
             <text class="text-gray-500 text-[13px] select-none">Este computador não é seu? Utilize o modo convidado para iniciar sessão de forma privada.</text>
           </div>
           <div class="flex gap-3 justify-end mt-4">

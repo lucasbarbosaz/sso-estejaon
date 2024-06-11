@@ -1,6 +1,7 @@
 RewriteEngine On
-RewriteBase /api/inc/system/process/login/
+RewriteBase /api/login/
 
-RewriteRule ^verify/login$ check_login.php [L]
-RewriteRule ^verify/register$ check_register.php [L]
+RewriteRule ^verify/login$ login.php [L]
+RewriteRule ^verify/register$ register.php [L]
+RewriteRule ^verify/recuperar_senha$ recuperar_senha.php [L]
 RewriteRule ^verify/security$ security.php [L]

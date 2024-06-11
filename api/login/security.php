@@ -1,5 +1,5 @@
 <?php
-require_once (__DIR__ . "/../../../../../geral.php");
+require_once ('../../geral.php');
 
 // Define a codificação como UTF-8
 header('Content-Type: application/json; charset=utf-8');

@@ -17,16 +17,16 @@ if (!isset($_SESSION)) {
 }
 
 
+define('DIR', __DIR__);
 
-require_once (__DIR__ . '/api/inc/system/class/class.core.php');
-require_once (__DIR__ . '/api/inc/system/functions.php');
+require_once (DIR . '/api/inc/system/class/class.core.php');
+require_once (DIR . '/api/inc/system/functions.php');
 
-define('SECRETKEY', "mxSdlxmaSdkxnasdjknxksd");
 define('EMAILS_PERMITIDOS', array('@gmail.com', '@outlook.com', '@hotmail.com', '@yahoo.com', '@icloud.com', '@protonmail.com'));
 // Defina constantes para o site
 define('SITE_NAME', 'EstejaON');
 define('SITE_URL', 'http://localhost');
-define('LOGIN_URL', 'http://localhost/login.php');
+define('LOGIN_URL', 'http://localhost/login');
 define('MAX_TENTATIVAS_LOGIN', 5); // Define o número máximo de tentativas de login
 define('TEMPO_BLOQUEIO_LOGIN', 300); // Define o tempo de bloqueio em segundos (300 segundos = 5 minutos)
 
