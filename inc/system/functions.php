@@ -15,4 +15,16 @@ function Redirect($url, $local = true)
 
     ob_end_flush();
 }
+
+function decryptParameter($encrypted) {
+    $key = '1234567890123456'; 
+    $iv = '1234567890123456'; 
+    $cipher = "AES-128-CBC";
+
+    $encrypted = base64_decode($encrypted);
+
+    $decrypted = openssl_decrypt($encrypted, $cipher, $key, OPENSSL_RAW_DATA, $iv);
+
+    return $decrypted;
+}
 ?>

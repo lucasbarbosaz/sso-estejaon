@@ -177,7 +177,7 @@ class Functions
 	{
 		if ($type == 'conectado') {
 			if (isset($_SESSION['id']) && isset($_SESSION['token'])) {
-				Redirect(SITE_URL . '/conta.php');
+				Redirect(SITE_URL . '/conta');
 			}
 		} else if ($type == 'desconectado') {
 			if (!isset($_SESSION['id']) && !isset($_SESSION['token'])) {
@@ -185,4 +185,9 @@ class Functions
 			}
 		}
 	}
+
+    public static function criptografarSenha($senha) //bcrypt padrao da nossa db
+    {
+        return password_hash($senha, PASSWORD_BCRYPT);
+    }
 }

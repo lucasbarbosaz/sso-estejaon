@@ -1,8 +1,11 @@
 RewriteEngine On
 
+RewriteRule ^recuperar_senha/([a-zA-Z0-9]+)$ /recuperar_senha.php?key=$1 [L]
+
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^([^\.]+)$ $1.php [L]
 
 RewriteCond %{THE_REQUEST} "^[^ ]* .*?\.php[? ].*$"
 RewriteRule ^(.*?)\.php$ /$1 [R=301,L]
+

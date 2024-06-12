@@ -245,7 +245,7 @@ if (extract($_POST)) {
                     $_SESSION['token'] = $token;
                     $_SESSION['id'] = $conta_id;
                     $_SESSION['nome'] = $nome;
-                    $_SESSION['senha'] = $senha;
+                    $_SESSION['senha'] = $senha_bcrypt;
                     $_SESSION['apelido'] = $apelido;
                     $_SESSION['email'] = $email;
                     $_SESSION['email_secundario'] = $email_secundario;
@@ -306,7 +306,7 @@ if (extract($_POST)) {
             $_SESSION['token'] = $token;
             $_SESSION['id'] = $conta_id;
             $_SESSION['nome'] = $nome;
-            $_SESSION['senha'] = $senha;
+            $_SESSION['senha'] = $senha_bcrypt;
             $_SESSION['apelido'] = $apelido;
             $_SESSION['email'] = $email;
             $_SESSION['email_secundario'] = $email_secundario;

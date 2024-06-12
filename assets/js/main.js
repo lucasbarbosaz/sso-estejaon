@@ -1,116 +1,136 @@
-document.addEventListener("DOMContentLoaded", function () {
+window.onload = function () {
+
+    function encryptParameter(parameter) {
+        var key = CryptoJS.enc.Utf8.parse('1234567890123456'); // chave de 16 bytes (128 bits)
+        var iv = CryptoJS.enc.Utf8.parse('1234567890123456'); // IV de 16 bytes (128 bits)
+        var encrypted = CryptoJS.AES.encrypt(JSON.stringify(parameter), key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        return encrypted.toString();
+    }
+
     var emailValidado = false;
 
     // login
-    document.getElementById('next-btn').addEventListener('click', function () {
-        var emailInput = document.getElementById('email-login').value;
 
-        var errorEmailLogin = document.getElementById('errorEmail-login');
-
-        if (!emailValidado) {
-            if (emailInput.trim() !== '') {
-                $.ajax({
-                    url: 'http://localhost/api/verify/login',
-                    type: 'POST',
-                    data: {
-                        type: 'email',
-                        email: emailInput
-                    },
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.success) {
-                            emailValidado = true;
-
-                            var emailSpan = document.getElementById('skj2');
-                            emailSpan.textContent = emailInput;
-
-                            // Show password input and hide email input
-                            var senhaDiv = document.getElementById('s0jn');
-                            var emailDiv = document.getElementById('s2jn');
-                            var forgotPassword = document.getElementById('sjw0');
-                            var textAccount = document.getElementById('s9nk');
-                            var emailAccount = document.getElementById('b3jk');
-                            emailDiv.classList.add('hidden');
-                            senhaDiv.classList.remove('hidden');
-                            forgotPassword.classList.add('hidden');
-                            textAccount.classList.add('hidden');
-                            emailAccount.classList.remove('hidden');
-                        }
-
-                        if (response.error) {
-                            if (response.input_error) {
-                                const inputError = document.getElementById("" + response.input_error + "");
-                                inputError.classList.add('border-red-300');
-                            }
-
-                            errorEmailLogin.textContent = "" + response.message + "";
-                            errorEmailLogin.classList.remove('hidden');
-                        }
-                    }, error: function (xhr, status, error) {
-                        console.log("Erro inesperado: " + error);
-                    }
-                })
-            }
-        } else {
-            var queryString = window.location.search;
-
+    if (document.getElementById('next-btn')) {
+        document.getElementById('next-btn').addEventListener('click', function () {
+            var alert = document.getElementById('resetpasswordsuccess');
+            alert.classList.add('hidden');
 
             var emailInput = document.getElementById('email-login').value;
-            var senhaInput = document.getElementById('senha-login').value;
-            var errorSenha = document.getElementById('errorSenha-login');
-
-            if (senhaInput.trim() !== '') {
-                $.ajax({
-                    url: 'http://localhost/api/verify/login' + queryString,
-                    type: 'POST',
-                    data: {
-                        type: 'senha',
-                        email: emailInput,
-                        senha: senhaInput
-                    },
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.success) {
-                            if (response.redirect) {
-                                window.location.href = response.location;
-                            } else {
-                                console.log(response);
-                                window.location.href = 'conta.php';
+    
+            var errorEmailLogin = document.getElementById('errorEmail-login');
+    
+            if (!emailValidado) {
+                if (emailInput.trim() !== '') {
+                    $.ajax({
+                        url: 'http://localhost/api/login_p',
+                        type: 'POST',
+                        data: {
+                            type: 'email',
+                            email: emailInput
+                        },
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response.success) {
+                                emailValidado = true;
+    
+                                var emailSpan = document.getElementById('skj2');
+                                emailSpan.textContent = emailInput;
+    
+                                // Show password input and hide email input
+                                var senhaDiv = document.getElementById('s0jn');
+                                var emailDiv = document.getElementById('s2jn');
+                                var forgotPassword = document.getElementById('sjw0');
+                                var textAccount = document.getElementById('s9nk');
+                                var emailAccount = document.getElementById('b3jk');
+                                emailDiv.classList.add('hidden');
+                                senhaDiv.classList.remove('hidden');
+                                forgotPassword.classList.add('hidden');
+                                textAccount.classList.add('hidden');
+                                emailAccount.classList.remove('hidden');
                             }
-                        }
-
-                        if (response.error) {
-                            if (response.input_error) {
-                                const inputError = document.getElementById("" + response.input_error + "");
-                                inputError.classList.add('border-red-300');
+    
+                            if (response.error) {
+                                if (response.input_error) {
+                                    const inputError = document.getElementById("" + response.input_error + "");
+                                    inputError.classList.add('border-red-300');
+                                }
+    
+                                errorEmailLogin.textContent = "" + response.message + "";
+                                errorEmailLogin.classList.remove('hidden');
                             }
-
-                            errorSenha.textContent = "" + response.message + "";
-                            errorSenha.classList.remove('hidden');
+                        }, error: function (xhr, status, error) {
+                            console.log("Erro inesperado: " + error);
                         }
+                    })
+                }
+            } else {
+                var queryString = window.location.search;
+    
+                //se tiver alerta de redifinição de senha com sucesso, remover
 
-                        if (response.type) {
-                            if (response.type == "url_blocked") {
-                                $.ajax({
-                                    url: 'http://localhost/api/verify/security?redirect_blocked=' + response.url + "",
-                                    type: 'GET',
-                                    dataType: 'json',
-                                    success: function (response) {
-                                        window.location.href = "/";
-                                    },
-                                    error: function (xhr, status, error) {
-                                        alert("Erro: " + error);
-                                    }
-                                })
+    
+                var emailInput = document.getElementById('email-login').value;
+                var senhaInput = document.getElementById('senha-login').value;
+                var errorSenha = document.getElementById('errorSenha-login');
+    
+                if (senhaInput.trim() !== '') {
+                    $.ajax({
+                        url: 'http://localhost/api/login_p' + queryString,
+                        type: 'POST',
+                        data: {
+                            type: 'senha',
+                            email: emailInput,
+                            senha: senhaInput
+                        },
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response.success) {
+                                if (response.redirect) {
+                                    window.location.href = response.location;
+                                } else {
+                                    console.log(response);
+                                    window.location.href = 'conta.php';
+                                }
                             }
+    
+                            if (response.error) {
+                                if (response.input_error) {
+                                    const inputError = document.getElementById("" + response.input_error + "");
+                                    inputError.classList.add('border-red-300');
+                                }
+    
+                                errorSenha.textContent = "" + response.message + "";
+                                errorSenha.classList.remove('hidden');
+                            }
+    
+                            if (response.type) {
+                                if (response.type == "url_blocked") {
+                                    $.ajax({
+                                        url: 'http://localhost/api/security?redirect_blocked=' + response.url + "",
+                                        type: 'GET',
+                                        dataType: 'json',
+                                        success: function (response) {
+                                            window.location.href = "/";
+                                        },
+                                        error: function (xhr, status, error) {
+                                            alert("Erro: " + error);
+                                        }
+                                    })
+                                }
+                            }
+                        }, error: function (xhr, status, error) {
+                            console.log("Erro inesperado: " + error);
                         }
-                    }, error: function (xhr, status, error) {
-                        console.log("Erro inesperado: " + error);
-                    }
-                })
+                    })
+                }
             }
-        }
-    });
+        });
+    }
 
 
 
@@ -179,7 +199,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const genderInput = document.getElementById('gender').value;
 
                 $.ajax({
-                    url: 'http://localhost/api/verify/register' + queryString,
+                    url: 'http://localhost/api/register' + queryString,
                     type: 'POST',
                     data: {
                         nome: nameInput,
@@ -285,7 +305,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                         break;
                                     case 'url_blocked':
                                         $.ajax({
-                                            url: 'http://localhost/api/verify/security?redirect_blocked=' + response.url + "",
+                                            url: 'http://localhost/api/security?redirect_blocked=' + response.url + "",
                                             type: 'GET',
                                             dataType: 'json',
                                             success: function (response) {
@@ -314,6 +334,163 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     //
 
+    function clearErrorBorders() {
+        // Remover a classe 'border-red-300' de todos os elementos
+        const elementsWithErrors = document.querySelectorAll('.border-red-300');
+        elementsWithErrors.forEach(function (element) {
+            element.classList.remove('border-red-300');
+        });
+
+    }
+
+
+
+    var nextForgot = document.getElementById('nextForgot');
+    if (nextForgot) {
+        document.getElementById('nextForgot').addEventListener('click', function () {
+            var emailInput = document.getElementById('email').value;
+            var errorEmail = document.getElementById('errorEmail');
+
+            if (!emailValidado) {
+                if (emailInput.trim() !== '') {
+                    $.ajax({
+                        url: 'http://localhost/api/recuperar_senha',
+                        type: 'POST',
+                        data: {
+                            type: 'enviaremail',
+                            email: emailInput
+                        },
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response.success) {
+                                emailValidado = true;
+                                alert("Enviamos uma redefinição de senha para o e-mail informado. Verifique-o!");
+                            }
+
+                            if (response.error) {
+                                if (response.input_error) {
+                                    const inputError = document.getElementById("" + response.input_error + "");
+                                    inputError.classList.add('border-red-300');
+                                }
+
+                                errorEmail.textContent = "" + response.message + "";
+                                errorEmail.classList.remove('hidden');
+                            }
+                        }, error: function (xhr, status, error) {
+                            console.log("Erro inesperado: " + error);
+                        }
+                    })
+                }
+            } else {
+                console.log("OXE");
+            }
+
+
+            // document.getElementById('s7jn').classList.toggle('hidden');
+            // document.getElementById('s5jn').classList.toggle('hidden');
+        });
+    }
+
+    var recuperarSenha = document.getElementById('recuperasenha');
+
+    if (recuperarSenha) {
+        document.getElementById('recuperasenha').addEventListener('click', function () {
+            clearErrorBorders();
+
+            var senhaInput = document.getElementById('passwordForgot').value;
+            var senhaInput2 = document.getElementById('passwordForgot2').value;
+
+            let pathname = window.location.pathname;
+            let parts = pathname.split('/');
+            let key = parts[parts.length - 1];
+
+            if (senhaInput.trim() !== '' && senhaInput2.trim() !== '') {
+                $.ajax({
+                    url: 'http://localhost/api/recuperar_senha',
+                    type: 'POST',
+                    data: {
+                        type: 'redefinirsenha',
+                        key: key,
+                        senha: senhaInput,
+                        senha2: senhaInput2
+
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+
+
+                        if (response.success) {
+                            var parametro = {
+                                r: "senha_atualizada", //r = resposta
+                                m: response.message, // m = mensagem recebida
+                                t: Math.floor(Date.now() / 1000) // t = timestamp (adiciona o timestamp atual em segundos)
+                            };
+
+                            var encrypted = encryptParameter(parametro);
+
+                            window.location.href = "/login?params=" + encodeURIComponent(encrypted);
+                        }
+
+                        if (response.error) {
+                            if (response.input_error) {
+                                if (Array.isArray(response.input_error)) {
+                                    response.input_error.forEach(function (inputErrorId) {
+                                        const inputError = document.getElementById(inputErrorId);
+                                        if (inputError) {
+                                            inputError.classList.add('border-red-300');
+                                        }
+                                    })
+                                } else {
+                                    const inputError = document.getElementById("" + response.input_error + "");
+                                    inputError.classList.add('border-red-300');
+                                }
+                            }
+
+                            if (response.type) {
+                                switch (response.type) {
+                                    case 'senha':
+
+                                        //desativando erro de outro input caso não esteja mais hidden
+                                        var errorSenha2 = document.getElementById('errorSenha2');
+                                        errorSenha2.textContent = "" + response.message + "";
+                                        errorSenha2.classList.add('hidden');
+
+                                        var errorSenha = document.getElementById('errorSenha');
+                                        errorSenha.textContent = "" + response.message + "";
+                                        errorSenha.classList.remove('hidden');
+                                        break;
+                                    case 'senha_diferente':
+
+                                        //desativando erro de outro input caso não esteja mais hidden
+                                        var errorSenha = document.getElementById('errorSenha');
+                                        errorSenha.textContent = "" + response.message + "";
+                                        errorSenha.classList.add('hidden');
+
+                                        var errorSenha2 = document.getElementById('errorSenha2');
+                                        errorSenha2.textContent = "" + response.message + "";
+                                        errorSenha2.classList.remove('hidden');
+                                        break;
+
+                                    case 'key_expired':
+                                        console.log("OI");
+                                        alert(response.message);
+                                        window.location.href = "/";
+                                        break;
+                                    case 'undefined_key':
+                                        window.location.href = "/";
+                                        break;
+                                }
+                            }
+
+                        }
+                    }, error: function (xhr, status, error) {
+                        console.log("Erro inesperado: " + error);
+                    }
+                })
+            }
+        });
+    }
+
 
     // Event listener for showing/hiding password
     var checkElement = document.getElementById('check');
@@ -340,4 +517,4 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
-});
+};

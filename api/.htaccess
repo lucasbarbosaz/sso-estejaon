@@ -1,7 +1,7 @@
 RewriteEngine On
-RewriteBase /api/login/
+RewriteBase /api/actions/
 
-RewriteRule ^verify/login$ login.php [L]
-RewriteRule ^verify/register$ register.php [L]
-RewriteRule ^verify/recuperar_senha$ recuperar_senha.php [L]
-RewriteRule ^verify/security$ security.php [L]
+RewriteRule ^login_p$ login_p.php [L]
+RewriteRule ^register$ register.php [L]
+RewriteRule ^recuperar_senha$ recuperar_senha.php [L]
+RewriteRule ^security$ security.php [L]

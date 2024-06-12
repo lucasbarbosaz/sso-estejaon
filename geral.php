@@ -6,9 +6,9 @@ ini_set('display_startup_errors', 1);
 
 
 if (!isset($_SESSION)) {
-    
+
     $lifetime = 30 * 24 * 60 * 60; //30 dias de sessão ativa
-    
+
     ini_set('session.cookie_lifetime', $lifetime);
 
     session_start();
@@ -21,6 +21,7 @@ define('DIR', __DIR__);
 
 require_once (DIR . '/inc/system/class/class.core.php');
 require_once (DIR . '/inc/system/functions.php');
+require_once (DIR . '/inc/system/estejaon_config.php');
 
 define('EMAILS_PERMITIDOS', array('@gmail.com', '@outlook.com', '@hotmail.com', '@yahoo.com', '@icloud.com', '@protonmail.com'));
 // Defina constantes para o site
@@ -31,8 +32,10 @@ define('MAX_TENTATIVAS_LOGIN', 5); // Define o número máximo de tentativas de 
 define('TEMPO_BLOQUEIO_LOGIN', 300); // Define o tempo de bloqueio em segundos (300 segundos = 5 minutos)
 
 
+
+
 //se usuario estiver logado liberar variavel $usuario em todo o sistema para obter dados do usuario
-if (isset($_SESSION['id']) && isset($_SESSION['senha']) && isset($_SESSION['token'])) {
+if (isset($_SESSION['id']) && isset($_SESSION['senha'])) {
     $usuario_id = $_SESSION['id'];
     $senha = password_hash($_SESSION['senha'], PASSWORD_BCRYPT);
 
@@ -64,8 +67,6 @@ if (isset($_SESSION['id']) && isset($_SESSION['senha']) && isset($_SESSION['toke
             Redirect(SITE_URL);
         }
     }
-
-} else {
 
 }
 
