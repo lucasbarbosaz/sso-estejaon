@@ -394,7 +394,9 @@ window.onload = function () {
                         success: function (response) {
                             if (response.success) {
                                 emailValidado = true;
-                                alert("Enviamos uma redefinição de senha para o e-mail informado. Verifique-o!");
+                                const inputSuccess = document.getElementById("sendemailsuccess");
+                                inputSuccess.classList.remove('hidden');
+                                inputSuccess.textContent = "" + response.message + "";
                             }
 
                             if (response.error) {
@@ -412,7 +414,7 @@ window.onload = function () {
                     })
                 }
             } else {
-                console.log("OXE");
+                alert("Algo deu errado");
             }
 
 

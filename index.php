@@ -1,7 +1,49 @@
 <?php
 
-require_once(__DIR__ . "/geral.php");
+require_once (__DIR__ . "/geral.php");
 
-header('Location: ' . $site["url_login"] );
-exit;
+
+if (isset($_GET['redirect_url'])) {
+    $appUrl = $_GET['redirect_url'];
+    if (isset($_SESSION['id']) && isset($_SESSION['token'])) {
+        
+        $obterSitesPermitidos = $db->prepare("SELECT url FROM host");
+        $obterSitesPermitidos->execute();
+        $urlsPermitidas = $obterSitesPermitidos->fetchAll(PDO::FETCH_COLUMN);
+
+        $obterHost = $Functions::getHostFromUrl($appUrl);
+
+        if (in_array($obterHost, $urlsPermitidas)) {
+            if (substr($appUrl, 0, 4) != "http") {
+                $source = parse_url("http://" . $appUrl);
+            } else {
+                $source = parse_url($appUrl);
+            }
+
+            if (isset($source['host'])) {
+                $scheme = isset($source['scheme']) ? $source['scheme'] : 'http';
+                $host = $source['host'];
+                $path = isset($source['path']) ? $source['path'] : '';
+
+                $target = $scheme . '://' . $host . $path;
+
+
+                Redirect($target . "?token=" . $_SESSION['token']);
+            }
+
+        } else {
+            Redirect($site["url_login"]);
+        }
+    } else {
+        Redirect($site["url_login"] . "?redirect_url=" . $appUrl);
+        exit;
+    }
+} else {
+    Redirect($site["url_login"]);
+    exit;
+}
+
+
+
+
 ?>
