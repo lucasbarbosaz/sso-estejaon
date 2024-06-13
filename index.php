@@ -29,10 +29,12 @@ if (isset($_GET['redirect_url'])) {
 
 
                 Redirect($target . "?token=" . $_SESSION['token']);
+                exit;
             }
 
         } else {
             Redirect($site["url_login"]);
+            exit;
         }
     } else {
         Redirect($site["url_login"] . "?redirect_url=" . $appUrl);
