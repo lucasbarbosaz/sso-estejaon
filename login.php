@@ -34,7 +34,7 @@ if (isset($_GET['params'])) {
 <html>
 
 <head>
-  <title>Iniciar Sessão - <?php echo SITE_NAME; ?> </title>
+  <title>Iniciar Sessão - <?php echo $site["nome"]; ?> </title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -64,7 +64,7 @@ if (isset($_GET['params'])) {
     <div class="relative bg-white p-8 py-14 w-1/2 rounded-lg flex lg:flex-row flex-col shadow-md">
       <div class="relative flex flex-col my-2 w-full">
         <text class="text-[28px] font-semibold mb-2">Inicie Sessão</text>
-        <text id="s9nk" class="text-[15px] font-regular mb-2">Use a sua Conta EstejaON</text>
+        <text id="s9nk" class="text-[15px] font-regular mb-2">Use a sua Conta <?= $site['nome']; ?> </text>
         <div id="b3jk"
           class="hidden flex border border-gray-400 rounded-full px-1 w-fit items-center my-2 cursor-pointer">
           <div class="flex icon">
@@ -118,8 +118,7 @@ if (isset($_GET['params'])) {
               class="absolute left-4 top-6 px-2 bg-white transform -translate-y-1 text-[12px] text-gray-400 transition-all duration-300 origin-0 select-none">Senha</label>
             <!-- Validation -->
 
-            <div id="errorSenha-login" class="select-none hidden text-red-500 font-medium text-[13px] px-1 my-1">Você
-              precisa digitar um e-mail válido!</div>
+            <div id="errorSenha-login" class="select-none hidden text-red-500 font-medium text-[13px] px-1 my-1"></div>
 
 
           </div>

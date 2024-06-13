@@ -10,5 +10,5 @@
     $Functions::deleteToken($token);
     session_destroy();
 
-    Redirect(SITE_URL);
+    Redirect($site["url"]);
 ?>

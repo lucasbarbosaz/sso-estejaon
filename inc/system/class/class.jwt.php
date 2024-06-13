@@ -1,8 +1,7 @@
 <?php
     class generateJWT {
 
-        private static $jwt_secret_key = '#axPksmXajLPi%uAxaEw%xPçVvDohS'; //nossa chave (n compartilhar)
-
+        
 
         static function base64UrlEncode($data) {
             return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
@@ -13,16 +12,20 @@
         }
     
         static function generateJWT($header, $payload) {
+            global $ssoConfig;
+
             $headerEncoded = self::base64UrlEncode(json_encode($header));
             $payloadEncoded = self::base64UrlEncode(json_encode($payload));
             
-            $signature = hash_hmac('sha256', "$headerEncoded.$payloadEncoded", self::$jwt_secret_key, true);
+            $signature = hash_hmac('sha256', "$headerEncoded.$payloadEncoded", $ssoConfig["jwt_secretkey"], true);
             $signatureEncoded = self::base64UrlEncode($signature);
             
             return "$headerEncoded.$payloadEncoded.$signatureEncoded";
         }
     
         static function validateJWT($jwt) {
+            global $ssoConfig;
+
             $parts = explode('.', $jwt);
             if (count($parts) !== 3) {
                 return false;
@@ -30,7 +33,7 @@
     
             list($headerEncoded, $payloadEncoded, $signatureEncoded) = $parts;
     
-            $signature = self::base64UrlEncode(hash_hmac('sha256', "$headerEncoded.$payloadEncoded", self::$jwt_secret_key, true));
+            $signature = self::base64UrlEncode(hash_hmac('sha256', "$headerEncoded.$payloadEncoded", $ssoConfig["jwt_secretkey"], true));
             if ($signature !== $signatureEncoded) {
                 return false; 
             }

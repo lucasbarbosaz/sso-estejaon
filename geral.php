@@ -25,11 +25,6 @@ require_once (DIR . '/inc/system/estejaon_config.php');
 
 define('EMAILS_PERMITIDOS', array('@gmail.com', '@outlook.com', '@hotmail.com', '@yahoo.com', '@icloud.com', '@protonmail.com'));
 // Defina constantes para o site
-define('SITE_NAME', 'EstejaON');
-define('SITE_URL', 'http://localhost');
-define('LOGIN_URL', 'http://localhost/login');
-define('MAX_TENTATIVAS_LOGIN', 5); // Define o número máximo de tentativas de login
-define('TEMPO_BLOQUEIO_LOGIN', 300); // Define o tempo de bloqueio em segundos (300 segundos = 5 minutos)
 
 
 //se usuario estiver logado liberar variavel $usuario em todo o sistema para obter dados do usuario
@@ -57,19 +52,19 @@ if (isset($_SESSION['id']) && isset($_SESSION['senha'])) {
             } else {
                 $Functions::deleteToken($_SESSION['token']);
                 session_destroy();
-                Redirect(SITE_URL);
+                Redirect($site["url"]);
             }
         } else {
             $Functions::deleteToken($_SESSION['token']);
             session_destroy();
-            Redirect(SITE_URL);
+            Redirect($site["url"]);
         }
     }
 
 }
 
 header("Content-Type: text/html; charset=utf-8", true);
-header("Access-Control-Allow-Origin: " . SITE_URL);
+header("Access-Control-Allow-Origin: " . $site["url"]);
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 setlocale(LC_ALL, 'pt_BR', 'pt_BR.iso-8859-15', 'portuguese');

@@ -180,13 +180,15 @@ class Functions
 
     static function Session($type)
     {
+        global $site;
+
         if ($type == 'conectado') {
             if (isset($_SESSION['id']) && isset($_SESSION['token'])) {
-                Redirect(SITE_URL . '/conta');
+                Redirect($site["url"] . '/conta');
             }
         } else if ($type == 'desconectado') {
             if (!isset($_SESSION['id']) && !isset($_SESSION['token'])) {
-                Redirect(SITE_URL);
+                Redirect($site["url"]);
             }
         }
     }

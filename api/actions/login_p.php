@@ -46,18 +46,16 @@ if (extract(($_POST))) {
         $email = (isset($_POST['email'])) ? $_POST['email'] : '';
         $senha = (isset($_POST['senha'])) ? $_POST['senha'] : '';
 
-        if (!isset($senha) || empty($senha)) {
+        if (verificarLoginBloqueado()) {
+            $response['error'] = true;
+            $response["back"] = false;
+            $response['message'] = "Você atingiu o limite de tentativas, espere " . converterSegundosEmMinutos($site['tempo_bloqueio_login']) . " para tentar novamente.";
+            echo json_encode($response);
+            exit;
+        } else if (!isset($senha) || empty($senha)) {
             $response['error'] = true;
             $response["back"] = false;
             $response['message'] = "Digite uma senha";
-
-            echo json_encode($response);
-            exit;
-        } else if(verificarLoginBloqueado()){
-            $response['error'] = true;
-            $response["back"] = false;
-            $response['message'] = "Você atingiu o limite de tentativas, espere 5 minutos para tentar novamente.";
-
             echo json_encode($response);
             exit;
         } else {
@@ -114,18 +112,18 @@ if (extract(($_POST))) {
                             $atualiza_ip->bindValue(1, $Functions::IP());
                             $atualiza_ip->bindValue(2, $obter_usuario['id']);
                             $atualiza_ip->execute();
-        
+
                             $removeTokenAntigo = $db->prepare("SELECT * FROM token WHERE usuario_id = ?");
                             $removeTokenAntigo->bindValue(1, $obter_usuario['id']);
                             $removeTokenAntigo->execute();
-        
+
                             if ($removeTokenAntigo->rowCount() > 0) {
                                 $removeTokenAntigo = $removeTokenAntigo->fetch(PDO::FETCH_ASSOC);
                                 $delete = $db->prepare("DELETE FROM token WHERE access_token = ?");
                                 $delete->bindValue(1, $removeTokenAntigo['access_token']);
                                 $delete->execute();
                             }
-        
+
                             $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
                             $salvarToken->bindValue(1, $token);
                             $salvarToken->bindValue(2, $obter_usuario['id']);
@@ -144,7 +142,7 @@ if (extract(($_POST))) {
                         }
                     } else {
                         registrarTentativaFalha();
-                        
+
                         $response['error'] = true;
                         $response['url'] = "$obterHost";
                         $response['type'] = 'url_blocked';
@@ -201,7 +199,7 @@ if (extract(($_POST))) {
             } else {
 
                 registrarTentativaFalha();
-                
+
                 $response["error"] = true;
                 $response['back'] = true;
                 $response["message"] = "E-mail ou senha incorretos";

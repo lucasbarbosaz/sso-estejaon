@@ -65,9 +65,9 @@ if (extract($_POST)) {
 
                     if ($inserir->rowCount() > 0) {
                         $mailBody = file_get_contents($_SERVER['DOCUMENT_ROOT'] . $emailConfig['recoveryPassword']);
-                        $mailBody = str_replace('%site_name%', SITE_NAME, $mailBody);
+                        $mailBody = str_replace('%site_name%', $site["nome"], $mailBody);
                         $mailBody = str_replace('%usuario%', $obterUsuario['nome'], $mailBody);
-                        $mailBody = str_replace('%keylink%', '<a href="' . SITE_URL . '/recuperar_senha/' . $key . '">' . SITE_URL . '/recuperar_senha/' . $key . '</a>', $mailBody);
+                        $mailBody = str_replace('%keylink%', '<a href="' . $site["url"] . '/recuperar_senha/' . $key . '">' . $site["url"] . '/recuperar_senha/' . $key . '</a>', $mailBody);
 
                         $enviou = $Email::enviarEmail(strtolower($mail), "Redifinição de senha", $mailBody);
 

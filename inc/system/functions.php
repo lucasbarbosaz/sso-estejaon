@@ -39,13 +39,15 @@ function verificarLoginBloqueado()
 
 function registrarTentativaFalha()
 {
+    global $site;
+
     if (!isset($_SESSION['tentativas_falhas'])) {
         $_SESSION['tentativas_falhas'] = 0;
     }
     $_SESSION['tentativas_falhas']++;
 
-    if ($_SESSION['tentativas_falhas'] >= MAX_TENTATIVAS_LOGIN) {
-        $_SESSION['bloqueado_ate'] = time() + TEMPO_BLOQUEIO_LOGIN;
+    if ($_SESSION['tentativas_falhas'] >= $site["max_tentativa_login"]) {
+        $_SESSION['bloqueado_ate'] = time() + $site["tempo_bloqueio_login"];
     }
 }
 
@@ -53,5 +55,12 @@ function redefinirTentativas()
 {
     unset($_SESSION['tentativas_falhas']);
     unset($_SESSION['bloqueado_ate']);
+}
+
+function converterSegundosEmMinutos($segundos)
+{
+    $minutos = floor($segundos / 60);
+
+    return sprintf("%d minutos", $minutos);
 }
 ?>
