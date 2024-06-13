@@ -21,13 +21,18 @@
         $url = "http://localhost/get_token.php?token=".$_SESSION['token'];
 
         $resp = json_decode($Functions::requestData($url, 'GET'));
-        
-        $usuario = "";
-        if ($resp->status_code == 200) {
-            $usuario = $resp->usuario;
+
+        if ($resp) {
+            $usuario = "";
+            if ($resp->status_code == 200) {
+                $usuario = $resp->usuario;
+            } else {
+                unset($_SESSION['token']);
+            }
         } else {
-            unset($_SESSION['token']);
+            header("Location: index.php");
         }
+        
     }
 ?>
 
