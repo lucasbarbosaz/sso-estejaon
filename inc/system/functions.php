@@ -2,6 +2,7 @@
 function Redirect($url, $local = true)
 {
     ob_start();
+    global $site;
 
     if ($url == 'reload') {
         header('Refresh: 0');
@@ -9,7 +10,7 @@ function Redirect($url, $local = true)
         $goto = $url;
         header('Location: ' . $goto);
     } else {
-        $goto = ($local) ? URL . $url : $url;
+        $goto = ($local) ? $site['url'] . $url : $url;
         header('Location: ' . $goto);
     }
 
