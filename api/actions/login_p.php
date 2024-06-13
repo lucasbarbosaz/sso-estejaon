@@ -53,6 +53,13 @@ if (extract(($_POST))) {
 
             echo json_encode($response);
             exit;
+        } else if(verificarLoginBloqueado()){
+            $response['error'] = true;
+            $response["back"] = false;
+            $response['message'] = "Você atingiu o limite de tentativas, espere 5 minutos para tentar novamente.";
+
+            echo json_encode($response);
+            exit;
         } else {
             $obter_senha = $db->prepare("SELECT senha FROM usuarios WHERE email = ?");
             $obter_senha->bindValue(1, $email);
@@ -126,12 +133,9 @@ if (extract(($_POST))) {
 
                             $_SESSION['token'] = $token;
                             $_SESSION['id'] = $obter_usuario['id'];
-                            $_SESSION['nome'] = $obter_usuario['nome'];
                             $_SESSION['senha'] = $obter_usuario['senha'];
-                            $_SESSION['apelido'] = $obter_usuario['apelido'];
-                            $_SESSION['email'] = $obter_usuario['email'];
-                            $_SESSION['email_secundario'] = $obter_usuario['email_secundario'];
-                            $_SESSION['telefone'] = $obter_usuario['telefone'];
+
+                            redefinirTentativas();
 
                             $response['success'] = true;
                             $response['redirect'] = true;
@@ -139,10 +143,13 @@ if (extract(($_POST))) {
                             echo json_encode($response);
                         }
                     } else {
+                        registrarTentativaFalha();
+                        
                         $response['error'] = true;
                         $response['url'] = "$obterHost";
                         $response['type'] = 'url_blocked';
                         echo json_encode($response);
+                        exit;
                     }
                 } else {
 
@@ -182,12 +189,9 @@ if (extract(($_POST))) {
 
                     $_SESSION['token'] = $token;
                     $_SESSION['id'] = $obter_usuario['id'];
-                    $_SESSION['nome'] = $obter_usuario['nome'];
                     $_SESSION['senha'] = $obter_usuario['senha'];
-                    $_SESSION['apelido'] = $obter_usuario['apelido'];
-                    $_SESSION['email'] = $obter_usuario['email'];
-                    $_SESSION['email_secundario'] = $obter_usuario['email_secundario'];
-                    $_SESSION['telefone'] = $obter_usuario['telefone'];
+
+                    redefinirTentativas();
 
                     $response['success'] = true;
                     echo json_encode($response);
@@ -195,11 +199,16 @@ if (extract(($_POST))) {
 
 
             } else {
+
+                registrarTentativaFalha();
+                
                 $response["error"] = true;
                 $response['back'] = true;
                 $response["message"] = "E-mail ou senha incorretos";
                 $response["input_error"] = "senha-login";
                 echo json_encode($response);
+                exit;
+
             }
         }
     }

@@ -140,21 +140,25 @@ class Functions
         );
 
         if ($method == "POST") {
-            curl_setopt_array($ch, array(
-                CURLOPT_POST => 1,
-                CURLOPT_HTTPHEADER => $headers,
-                CURLOPT_POSTFIELDS => $postdata,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_VERBOSE => 1
-            )
+            curl_setopt_array(
+                $ch,
+                array(
+                    CURLOPT_POST => 1,
+                    CURLOPT_HTTPHEADER => $headers,
+                    CURLOPT_POSTFIELDS => $postdata,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_VERBOSE => 1
+                )
             );
         } else {
-            curl_setopt_array($ch, array(
-                CURLOPT_HTTPGET => 1,
-                CURLOPT_HTTPHEADER => $headers,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_VERBOSE => 1
-            )
+            curl_setopt_array(
+                $ch,
+                array(
+                    CURLOPT_HTTPGET => 1,
+                    CURLOPT_HTTPHEADER => $headers,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_VERBOSE => 1
+                )
             );
         }
 
@@ -165,29 +169,127 @@ class Functions
         return $output;
     }
 
-    static function getHostFromUrl($url) {
+    static function getHostFromUrl($url)
+    {
         if (!preg_match('/^https?:\/\//', $url)) {
-            $url = 'http://' . $url; 
+            $url = 'http://' . $url;
         }
         $parsedUrl = parse_url($url);
         return $parsedUrl['host'] ?? null;
     }
 
     static function Session($type)
-	{
-		if ($type == 'conectado') {
-			if (isset($_SESSION['id']) && isset($_SESSION['token'])) {
-				Redirect(SITE_URL . '/conta');
-			}
-		} else if ($type == 'desconectado') {
-			if (!isset($_SESSION['id']) && !isset($_SESSION['token'])) {
-				Redirect(SITE_URL);
-			}
-		}
-	}
+    {
+        if ($type == 'conectado') {
+            if (isset($_SESSION['id']) && isset($_SESSION['token'])) {
+                Redirect(SITE_URL . '/conta');
+            }
+        } else if ($type == 'desconectado') {
+            if (!isset($_SESSION['id']) && !isset($_SESSION['token'])) {
+                Redirect(SITE_URL);
+            }
+        }
+    }
 
-    public static function criptografarSenha($senha) //bcrypt padrao da nossa db
+    static function criptografarSenha($senha) //bcrypt padrao da nossa db
     {
         return password_hash($senha, PASSWORD_BCRYPT);
     }
+
+    static function validarCPF($cpf)
+    {
+        $cpf = preg_replace('/\D/', '', $cpf);
+
+        if (strlen($cpf) != 11) {
+            return false;
+        }
+
+        if (preg_match('/(\d)\1{10}/', $cpf)) {
+            return false;
+        }
+
+        for ($t = 9; $t < 11; $t++) {
+            for ($d = 0, $c = 0; $c < $t; $c++) {
+                $d += $cpf[$c] * (($t + 1) - $c);
+            }
+            $d = ((10 * $d) % 11) % 10;
+            if ($cpf[$c] != $d) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    static function validarCNPJ($cnpj)
+    {
+        $cnpj = preg_replace('/\D/', '', $cnpj);
+
+        if (strlen($cnpj) != 14) {
+            return false;
+        }
+
+        if (preg_match('/(\d)\1{13}/', $cnpj)) {
+            return false;
+        }
+
+        $tamanho = 12;
+        $numeros = substr($cnpj, 0, $tamanho);
+        $digitos = substr($cnpj, $tamanho);
+
+        $soma = 0;
+        $pos = $tamanho - 7;
+        for ($i = $tamanho; $i >= 1; $i--) {
+            $soma += $numeros[$tamanho - $i] * $pos--;
+            if ($pos < 2) {
+                $pos = 9;
+            }
+        }
+        $resultado = $soma % 11 < 2 ? 0 : 11 - ($soma % 11);
+        if ($resultado != $digitos[0]) {
+            return false;
+        }
+
+        $tamanho = 13;
+        $numeros = substr($cnpj, 0, $tamanho);
+        $soma = 0;
+        $pos = $tamanho - 7;
+        for ($i = $tamanho; $i >= 1; $i--) {
+            $soma += $numeros[$tamanho - $i] * $pos--;
+            if ($pos < 2) {
+                $pos = 9;
+            }
+        }
+        $resultado = $soma % 11 < 2 ? 0 : 11 - ($soma % 11);
+        if ($resultado != $digitos[1]) {
+            return false;
+        }
+
+        return true;
+    }
+
+    static function formatarCelular($numeroCelular)
+    {
+        $numeroCelular = preg_replace('/\D/', '', $numeroCelular);
+
+        if (strlen($numeroCelular) == 11) {
+            $numeroFormatado = sprintf(
+                "(%s) %s-%s",
+                substr($numeroCelular, 0, 2),      // DDD
+                substr($numeroCelular, 2, 5),      // Parte do número
+                substr($numeroCelular, 7)
+            );
+            return $numeroFormatado;
+        } else {
+            return "Número de celular inválido.";
+        }
+    }
+
+    static function removerFormatacaoCNPJ($cnpj)
+    {
+        $cnpjNumerico = preg_replace('/\D/', '', $cnpj);
+        return $cnpjNumerico;
+    }
+
+    
 }

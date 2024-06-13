@@ -49,6 +49,14 @@ if (isset($_GET['params'])) {
   body {
     font-family: "Inter", sans-serif;
   }
+
+  .input-field-cpf {
+    display: none;
+  }
+
+  .input-field-cnpj {
+    display: none;
+  }
 </style>
 
 <body class="w-full h-full bg-gray-100">
@@ -83,6 +91,9 @@ if (isset($_GET['params'])) {
               <?= $mensagem; ?>
             </div>
           <?php } ?>
+
+
+          
           <div class="relative my-1" id="s2jn">
 
             <input type="email" id="email-login" name="email-login"
@@ -93,8 +104,7 @@ if (isset($_GET['params'])) {
             <label for="email" id="labelEmail"
               class="absolute left-4 top-6 px-2 bg-white transform -translate-y-1 text-[12px] text-gray-400 transition-all duration-300 origin-0 select-none">E-mail</label>
             <!-- Validation -->
-            <div id="errorEmail-login" class="hidden select-none text-red-500 font-medium text-[13px] px-1 my-1">Digite
-              um e-mail válido!</div>
+            <div id="errorEmail-login" class="hidden select-none text-red-500 font-medium text-[13px] px-1 my-1"></div>
 
 
           </div>
@@ -125,12 +135,6 @@ if (isset($_GET['params'])) {
               class="select-none text-[14px] px-4 text-center w-fit hover:bg-[#0001311a] text-[#000131] p-2 rounded-full font-medium hover:!text-[#000131] transition delay-75 duration-75 cursor-pointer">
               Criar conta <div
                 class="hidden absolute dropdown w-fit bg-[#c9c9e1] rounded-lg bottom-[-125px] right-[6.5rem] shadow-md">
-                <ul class="py-2 text-[14px]">
-                  <li class="p-3 px-4 hover:bg-[#0001311a] font-medium cursor-pointer" id="usePessoal">Para uso pessoal
-                  </li>
-                  <li class="p-3 px-4 hover:bg-[#0001311a] font-medium cursor-pointer" id="useBusiness">Para empresas
-                  </li>
-                </ul>
               </div>
             </div>
             <button type="button" id="next-btn"
@@ -286,6 +290,49 @@ if (isset($_GET['params'])) {
 
               <div id="errorGenero" class="hidden select-none text-red-500 font-medium text-[13px] px-1 my-1"></div>
             </div>
+
+            <div class="relative my-1 mb-3" id="s2jn">
+              <select id="tipoPessoa" name="tipoPessoa"
+                class="w-full form-control !outline-none pt-[1.03rem] p-3 text-[13px] text-[#47494d] font-medium shadow-none rounded-md border-2 border-[#eceeef] focus:border-[#000131]"
+                onfocus="document.getElementById('labelTipoPessoa').classList.add('!top-[-5px]', '!text-[#000131]')"
+                onblur="if(this.value==''){document.getElementById('labelTipoPessoa').classList.remove('!top-[-5px]', '!text-[#000131]')}"
+                onchange="alterarTipoPessoa()" required>
+                <option value="" disabled selected hidden></option>
+                <option value="pf">Pessoa Física</option>
+                <option value="pj">Pessoa Jurídica</option>
+              </select>
+              <label for="tipoPessoa" id="labelTipoPessoa"
+                class="absolute left-4 top-6 px-2 bg-white transform -translate-y-1 text-[12px] text-gray-400 transition-all duration-300 origin-0 select-none">Tipo
+                de documento</label>
+
+              <div id="errorTipoPessoa" class="hidden select-none text-red-500 font-medium text-[13px] px-1 my-1"></div>
+            </div>
+
+            <div class="relative my-1 mb-6" id="s2jn">
+              <input type="text" id="cpf" name="cpf" placeholder="CPF ex: 000.000.000-00" maxlength="11"
+                class="w-full md:w-[100%] input-field-cpf form-control !outline-none pt-[1.03rem] p-3 text-[13px] text-[#47494d] font-medium shadow-none rounded-md border-2 border-[#eceeef] focus:border-[#000131]"
+                onfocus="document.getElementById('labelCpf').classList.add('!top-[-5px]', '!text-[#000131]')"
+                onblur="if(this.value==''){document.getElementById('labelCpf').classList.remove('!top-[-5px]', '!text-[#000131]')}"
+                >
+              <label for="cpf" id="labelCpf"
+                class="absolute left-4 top-6 input-field-cpf px-2 bg-white transform -translate-y-1 text-[12px] text-gray-400 transition-all duration-300 origin-0 select-none">CPF</label>
+
+              <div id="errorCpf" class="hidden select-none text-red-500 font-medium text-[13px] px-1 my-1">
+              </div>
+            </div>
+
+            <div class="relative my-1 mb-6" id="s2jn">
+              <input type="text" id="cnpj" name="cnpj" placeholder="CNPJ ex: 00.000.000/0000-00" maxlength="18"
+                class="w-full md:w-[100%] input-field-cnpj form-control !outline-none pt-[1.03rem] p-3 text-[13px] text-[#47494d] font-medium shadow-none rounded-md border-2 border-[#eceeef] focus:border-[#000131]"
+                onfocus="document.getElementById('labelCnpj').classList.add('!top-[-5px]', '!text-[#000131]')"
+                onblur="if(this.value==''){document.getElementById('labelCnpj').classList.remove('!top-[-5px]', '!text-[#000131]')}"
+                >
+
+
+              <div id="errorCnpj" class="hidden select-none text-red-500 font-medium text-[13px] px-1 my-1">
+              </div>
+            </div>
+
             <button type="button" id="concluirBtn"
               class="select-none text-[14px] px-4 w-fit bg-[#000131] text-white p-2 rounded-full font-medium border !border-[#000131] hover:bg-white hover:!text-[#000131] transition delay-75 duration-75 float-right right-0">Concluir</button>
           </div>
@@ -302,6 +349,43 @@ if (isset($_GET['params'])) {
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
   <script src="/assets/js/main.js?v<?= time(); ?>"></script>
+
+  <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+      var cpfInput = document.querySelector("#cpf");
+
+      cpfInput.addEventListener("blur", function () {
+            var cpf = cpfInput.value.replace(/\D/g, ""); // Remove caracteres não numéricos
+            if (cpf.length === 11) {
+                cpfInput.value = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+            } else {
+                alert("CPF inválido. Deve conter 11 dígitos.");
+                cpfInput.value = "";
+            }
+        });
+
+      document.getElementById('cnpj').addEventListener('input', function (e) {
+      var x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,3})(\d{0,3})(\d{0,4})(\d{0,2})/);
+      e.target.value = !x[2] ? x[1] : x[1] + '.' + x[2] + '.' + x[3] + '/' + x[4] + (x[5] ? '-' + x[5] : '');
+    });
+    });
+
+    function alterarTipoPessoa() {
+      var tipoPessoa = document.getElementById('tipoPessoa').value;
+      var cnpjField = document.getElementById('cnpj');
+      var cpfField = document.getElementById('cpf');
+
+      cnpjField.style.display = 'none';
+      cpfField.style.display = 'none';
+
+      if (tipoPessoa === 'pj') {
+        cnpjField.style.display = 'block';
+      } else if (tipoPessoa === 'pf') {
+        cpfField.style.display = 'block';
+      }
+    }
+  </script>
 </body>
 
 </html>

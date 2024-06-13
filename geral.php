@@ -32,8 +32,6 @@ define('MAX_TENTATIVAS_LOGIN', 5); // Define o número máximo de tentativas de 
 define('TEMPO_BLOQUEIO_LOGIN', 300); // Define o tempo de bloqueio em segundos (300 segundos = 5 minutos)
 
 
-
-
 //se usuario estiver logado liberar variavel $usuario em todo o sistema para obter dados do usuario
 if (isset($_SESSION['id']) && isset($_SESSION['senha'])) {
     $usuario_id = $_SESSION['id'];

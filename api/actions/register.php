@@ -19,6 +19,8 @@ if (extract($_POST)) {
     $mes = (isset($_POST['mes'])) ? $_POST['mes'] : '';
     $ano = (isset($_POST['ano'])) ? $_POST['ano'] : '';
     $genero = (isset($_POST['genero'])) ? $_POST['genero'] : '';
+    $tipoPessoa = (isset($_POST['tipoPessoa'])) ? $_POST['tipoPessoa'] : '';
+
 
     $email_existe = $db->prepare("SELECT email FROM usuarios WHERE email = ?");
     $email_existe->bindValue(1, $email);
@@ -173,15 +175,59 @@ if (extract($_POST)) {
         $response['error'] = "Você tem que maior de idade para continuar.";
         echo json_encode($response);
         exit;
-    } else if (!isset($genero)) {
+    } else if (!isset($genero) || empty($genero)) {
         $response['error'] = true;
         $response['type'] = 'genero';
         $response['message'] = "Por favor, escolha seu gênero.";
         $response['input_error'] = "gender";
         echo json_encode($response);
         exit;
-    } else {
+    } else if (!isset($tipoPessoa) || empty($tipoPessoa)) {
+        $response['error'] = true;
+        $response['type'] = 'tipoPessoa';
+        $response['message'] = "Por favor, escolha o tipo do seu documento.";
+        $response['input_error'] = "tipoPessoa";
+        echo json_encode($response);
+        exit;
+    }  else {
 
+        if ($tipoPessoa == "pf") {
+            $cpf = (isset($_POST['cpf'])) ? $_POST['cpf'] : '';
+            
+           if (!$Functions::validarCPF($cpf)) {
+                $response['error'] = true;
+                $response['type'] = 'cpf';
+                $response['message'] = "Por favor, insira um CPF válido";
+                $response['input_error'] = "cpf";
+                echo json_encode($response);
+                exit;
+            } else if (!isset($cpf) || empty($cpf)) {
+                $response['error'] = true;
+                $response['type'] = 'cpf';
+                $response['message'] = "Por favor, insira um CPF";
+                $response['input_error'] = "cpf";
+                echo json_encode($response);
+                exit;
+            }
+        } else if ($tipoPessoa == "pj") {
+            $cnpj = (isset($_POST['cnpj'])) ? $_POST['cnpj'] : '';
+
+            if (!$Functions::validarCNPJ($cnpj)) {
+                $response['error'] = true;
+                $response['type'] = 'cnpj';
+                $response['message'] = "Por favor, insira um CNPJ válido";
+                $response['input_error'] = "cnpj";
+                echo json_encode($response);
+                exit;
+        } else if (!isset($cnpj) || empty($cnpj)) {
+            $response['error'] = true;
+            $response['type'] = 'cnpj';
+            $response['message'] = "Por favor, insira um CNPJ";
+            $response['input_error'] = "cnpj";
+            echo json_encode($response);
+            exit;
+        }
+    }
         
         if (isset($_GET['redirect_url'])) {
             $appUrl = $_GET['redirect_url'];
@@ -203,58 +249,66 @@ if (extract($_POST)) {
 
                 if (isset($source['host'])) {
                     $senha_bcrypt = password_hash($senha, PASSWORD_BCRYPT);
+
+                    $dataEmpresa = json_decode($Functions::requestData("https://publica.cnpj.ws/cnpj/" . $Functions::removerFormatacaoCNPJ($cnpj) . "", "GET"));
+
+                    if ($dataEmpresa) {
+                        $inserir_conta = $db->prepare("INSERT INTO usuarios (nome, apelido, email, email_secundario, telefone, senha, data_nascimento, genero, tipo_pessoa, cpf, cnpj, razao_social, descricao_empresa, ultimo_ip, registro_ip) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                        $inserir_conta->bindValue(1, $nome);
+                        $inserir_conta->bindValue(2, $apelido);
+                        $inserir_conta->bindValue(3, $email);
+                        $inserir_conta->bindValue(4, $email_secundario);
+                        $inserir_conta->bindValue(5, $Functions::formatarNumeroCelular($telefone));
+                        $inserir_conta->bindValue(6, $senha_bcrypt);
+                        $inserir_conta->bindValue(7, $data);
+                        $inserir_conta->bindValue(8, $genero);
+                        $inserir_conta->bindValue(9, $tipoPessoa);
+                        $inserir_conta->bindValue(10, $cpf ? $cpf : "");
+                        $inserir_conta->bindValue(11, $cnpj ? $cnpj : "");
+                        $inserir_conta->bindValue(12, $dataEmpresa->razao_social);
+                        $inserir_conta->bindValue(13, $dataEmpresa->natureza_juridica->descricao);
+                        $inserir_conta->bindValue(14, $Functions::IP());
+                        $inserir_conta->bindValue(15, $Functions::IP());
+                        $inserir_conta->execute();
+                        $conta_id = $db->lastInsertId();
+    
+                        $header = [
+                            'alg' => 'HS256',
+                            'typ' => 'JWT'
+                        ];
+    
+                        $payload = [
+                            'iat' => time(),
+                            'exp' => time() + (30 * 24 * 60 * 60), // expira em 30 dias
+                            'sub' => $conta_id
+                        ];
+    
+                        $token = $JWT::generateJWT($header, $payload);
+    
+                        $scheme = isset($source['scheme']) ? $source['scheme'] : 'http';
+                        $host = $source['host'];
+                        $path = isset($source['path']) ? $source['path'] : '';
+    
+                        $target = $scheme . '://' . $host . $path;
+    
+                        $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
+                        $salvarToken->bindValue(1, $token);
+                        $salvarToken->bindValue(2, $conta_id);
+                        $salvarToken->execute();
+    
+                        $_SESSION['token'] = $token;
+                        $_SESSION['id'] = $conta_id;
+                        $_SESSION['senha'] = $senha_bcrypt;
+    
+    
+                        $response['success'] = true;
+                        $response['redirect'] = true;
+                        $response['location'] = $target.'?token='.$token;
+                        echo json_encode($response);
+                    } else {
+                        $response['error'] = true;
+                    }
    
-                    $inserir_conta = $db->prepare("INSERT INTO usuarios (nome, apelido, email, email_secundario, telefone, senha, data_nascimento, genero, ultimo_ip, registro_ip) VALUES (?,?,?,?,?,?,?,?,?,?)");
-                    $inserir_conta->bindValue(1, $nome);
-                    $inserir_conta->bindValue(2, $apelido);
-                    $inserir_conta->bindValue(3, $email);
-                    $inserir_conta->bindValue(4, $email_secundario);
-                    $inserir_conta->bindValue(5, $Functions::formatarNumeroCelular($telefone));
-                    $inserir_conta->bindValue(6, $senha_bcrypt);
-                    $inserir_conta->bindValue(7, $data);
-                    $inserir_conta->bindValue(8, $genero);
-                    $inserir_conta->bindValue(9, $Functions::IP());
-                    $inserir_conta->bindValue(10, $Functions::IP());
-                    $inserir_conta->execute();
-                    $conta_id = $db->lastInsertId();
-
-                    $header = [
-                        'alg' => 'HS256',
-                        'typ' => 'JWT'
-                    ];
-
-                    $payload = [
-                        'iat' => time(),
-                        'exp' => time() + (30 * 24 * 60 * 60), // expira em 30 dias
-                        'sub' => $conta_id
-                    ];
-
-                    $token = $JWT::generateJWT($header, $payload);
-
-                    $scheme = isset($source['scheme']) ? $source['scheme'] : 'http';
-                    $host = $source['host'];
-                    $path = isset($source['path']) ? $source['path'] : '';
-
-                    $target = $scheme . '://' . $host . $path;
-
-                    $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
-                    $salvarToken->bindValue(1, $token);
-                    $salvarToken->bindValue(2, $conta_id);
-                    $salvarToken->execute();
-
-                    $_SESSION['token'] = $token;
-                    $_SESSION['id'] = $conta_id;
-                    $_SESSION['nome'] = $nome;
-                    $_SESSION['senha'] = $senha_bcrypt;
-                    $_SESSION['apelido'] = $apelido;
-                    $_SESSION['email'] = $email;
-                    $_SESSION['email_secundario'] = $email_secundario;
-                    $_SESSION['telefone'] = $telefone;
-                    
-                    $response['success'] = true;
-                    $response['redirect'] = true;
-                    $response['location'] = $target.'?token='.$token;
-                    echo json_encode($response);
 
                 }
 
@@ -269,51 +323,55 @@ if (extract($_POST)) {
 
             $senha_bcrypt = password_hash($senha, PASSWORD_BCRYPT);
 
-            $inserir_conta = $db->prepare("INSERT INTO usuarios (nome, apelido, email, email_secundario, telefone, senha, data_nascimento, genero, ultimo_ip, registro_ip) VALUES (?,?,?,?,?,?,?,?,?,?)");
-            $inserir_conta->bindValue(1, $nome);
-            $inserir_conta->bindValue(2, $apelido);
-            $inserir_conta->bindValue(3, $email);
-            $inserir_conta->bindValue(4, $email_secundario);
-            $inserir_conta->bindValue(5, $Functions::formatarNumeroCelular($telefone));
-            $inserir_conta->bindValue(6, $senha_bcrypt);
-            $inserir_conta->bindValue(7, $data);
-            $inserir_conta->bindValue(8, $genero);
-            $inserir_conta->bindValue(9, $Functions::IP());
-            $inserir_conta->bindValue(10, $Functions::IP());
-            $inserir_conta->execute();
+            $dataEmpresa = json_decode($Functions::requestData("https://publica.cnpj.ws/cnpj/" . $Functions::removerFormatacaoCNPJ($cnpj) . "", "GET"));
 
-            $conta_id = $db->lastInsertId();
+            if ($dataEmpresa) {
+                $inserir_conta = $db->prepare("INSERT INTO usuarios (nome, apelido, email, email_secundario, telefone, senha, data_nascimento, genero, tipo_pessoa, cpf, cnpj, razao_social, descricao_empresa, ultimo_ip, registro_ip) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                $inserir_conta->bindValue(1, $nome);
+                $inserir_conta->bindValue(2, $apelido);
+                $inserir_conta->bindValue(3, $email);
+                $inserir_conta->bindValue(4, $email_secundario);
+                $inserir_conta->bindValue(5, $Functions::formatarNumeroCelular($telefone));
+                $inserir_conta->bindValue(6, $senha_bcrypt);
+                $inserir_conta->bindValue(7, $data);
+                $inserir_conta->bindValue(8, $genero);
+                $inserir_conta->bindValue(9, $tipoPessoa);
+                $inserir_conta->bindValue(10, $cpf ? $cpf : "");
+                $inserir_conta->bindValue(11, $cnpj ? $cnpj : "");
+                $inserir_conta->bindValue(12, $dataEmpresa->razao_social);
+                $inserir_conta->bindValue(13, $dataEmpresa->natureza_juridica->descricao);
+                $inserir_conta->bindValue(14, $Functions::IP());
+                $inserir_conta->bindValue(15, $Functions::IP());
+                $inserir_conta->execute();
+                $conta_id = $db->lastInsertId();
+    
+                $header = [
+                    'alg' => 'HS256',
+                    'typ' => 'JWT'
+                ];
+    
+                $payload = [
+                    'iat' => time(),
+                    'exp' => time() + (30 * 24 * 60 * 60), // expira em 30 dias
+                    'sub' => $conta_id
+                ];
+    
+                $token = $JWT::generateJWT($header, $payload);
+    
+                $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
+                $salvarToken->bindValue(1, $token);
+                $salvarToken->bindValue(2, $conta_id);
+                $salvarToken->execute();
+    
+    
+                $_SESSION['token'] = $token;
+                $_SESSION['id'] = $conta_id;
+                $_SESSION['senha'] = $senha_bcrypt;
+    
+                $response['success'] = true;
+                echo json_encode($response);
+            }
 
-            $header = [
-                'alg' => 'HS256',
-                'typ' => 'JWT'
-            ];
-
-            $payload = [
-                'iat' => time(),
-                'exp' => time() + (30 * 24 * 60 * 60), // expira em 30 dias
-                'sub' => $conta_id
-            ];
-
-            $token = $JWT::generateJWT($header, $payload);
-
-            $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
-            $salvarToken->bindValue(1, $token);
-            $salvarToken->bindValue(2, $conta_id);
-            $salvarToken->execute();
-
-
-            $_SESSION['token'] = $token;
-            $_SESSION['id'] = $conta_id;
-            $_SESSION['nome'] = $nome;
-            $_SESSION['senha'] = $senha_bcrypt;
-            $_SESSION['apelido'] = $apelido;
-            $_SESSION['email'] = $email;
-            $_SESSION['email_secundario'] = $email_secundario;
-            $_SESSION['telefone'] = $telefone;
-
-            $response['success'] = true;
-            echo json_encode($response);
         }
     }
 } else {

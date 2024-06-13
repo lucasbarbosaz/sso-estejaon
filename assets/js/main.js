@@ -1,5 +1,20 @@
 window.onload = function () {
 
+    function alterarTipoPessoa() {
+        var tipoPessoa = document.getElementById('tipo-pessoa').value;
+        var cnpjField = document.getElementById('cnpj-field');
+        var cpfField = document.getElementById('cpf-field');
+        
+        cnpjField.style.display = 'none';
+        cpfField.style.display = 'none';
+        
+        if (tipoPessoa === 'juridica') {
+            cnpjField.style.display = 'block';
+        } else if (tipoPessoa === 'fisica') {
+            cpfField.style.display = 'block';
+        }
+    }
+
     function encryptParameter(parameter) {
         var key = CryptoJS.enc.Utf8.parse('1234567890123456'); // chave de 16 bytes (128 bits)
         var iv = CryptoJS.enc.Utf8.parse('1234567890123456'); // IV de 16 bytes (128 bits)
@@ -18,12 +33,15 @@ window.onload = function () {
     if (document.getElementById('next-btn')) {
         document.getElementById('next-btn').addEventListener('click', function () {
             var alert = document.getElementById('resetpasswordsuccess');
-            alert.classList.add('hidden');
+
+            if (alert) {
+                alert.classList.add('hidden');
+            }
 
             var emailInput = document.getElementById('email-login').value;
-    
+
             var errorEmailLogin = document.getElementById('errorEmail-login');
-    
+
             if (!emailValidado) {
                 if (emailInput.trim() !== '') {
                     $.ajax({
@@ -37,10 +55,10 @@ window.onload = function () {
                         success: function (response) {
                             if (response.success) {
                                 emailValidado = true;
-    
+
                                 var emailSpan = document.getElementById('skj2');
                                 emailSpan.textContent = emailInput;
-    
+
                                 // Show password input and hide email input
                                 var senhaDiv = document.getElementById('s0jn');
                                 var emailDiv = document.getElementById('s2jn');
@@ -53,13 +71,13 @@ window.onload = function () {
                                 textAccount.classList.add('hidden');
                                 emailAccount.classList.remove('hidden');
                             }
-    
+
                             if (response.error) {
                                 if (response.input_error) {
                                     const inputError = document.getElementById("" + response.input_error + "");
                                     inputError.classList.add('border-red-300');
                                 }
-    
+
                                 errorEmailLogin.textContent = "" + response.message + "";
                                 errorEmailLogin.classList.remove('hidden');
                             }
@@ -70,14 +88,14 @@ window.onload = function () {
                 }
             } else {
                 var queryString = window.location.search;
-    
+
                 //se tiver alerta de redifinição de senha com sucesso, remover
 
-    
+
                 var emailInput = document.getElementById('email-login').value;
                 var senhaInput = document.getElementById('senha-login').value;
                 var errorSenha = document.getElementById('errorSenha-login');
-    
+
                 if (senhaInput.trim() !== '') {
                     $.ajax({
                         url: 'http://localhost/api/login_p' + queryString,
@@ -97,17 +115,17 @@ window.onload = function () {
                                     window.location.href = 'conta.php';
                                 }
                             }
-    
+
                             if (response.error) {
                                 if (response.input_error) {
                                     const inputError = document.getElementById("" + response.input_error + "");
                                     inputError.classList.add('border-red-300');
                                 }
-    
+
                                 errorSenha.textContent = "" + response.message + "";
                                 errorSenha.classList.remove('hidden');
                             }
-    
+
                             if (response.type) {
                                 if (response.type == "url_blocked") {
                                     $.ajax({
@@ -134,9 +152,9 @@ window.onload = function () {
 
 
 
-    var useBusiness = document.getElementById('useBusiness');
-    if (useBusiness) {
-        useBusiness.addEventListener('click', function () {
+    var createAccount = document.getElementById('createAccount');
+    if (createAccount) {
+        createAccount.addEventListener('click', function () {
             // Hide loginForm and show registerBusiness form
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('registerBusiness').classList.remove('hidden');
@@ -163,6 +181,8 @@ window.onload = function () {
 
 
 
+
+
     if (avanceBtn) {
         avanceBtn.addEventListener('click', function () {
 
@@ -178,12 +198,15 @@ window.onload = function () {
         });
     }
 
+
     //registro
     var concluirBtn = document.getElementById('concluirBtn');
     if (concluirBtn) {
         concluirBtn.addEventListener('click', function () {
             if (checkRequiredFields('j23jn')) {
                 var queryString = window.location.search;
+
+
 
 
                 const nameInput = document.getElementById('name').value;
@@ -197,7 +220,11 @@ window.onload = function () {
                 const monthInput = document.getElementById('birthdaymes').value;
                 const yearInput = document.getElementById('birthdayano').value;
                 const genderInput = document.getElementById('gender').value;
-
+                const tipoPessoa = document.getElementById('tipoPessoa').value;
+                const cpfInput = document.getElementById('cpf').value;
+                const cnpjInput = document.getElementById('cnpj').value;
+                
+                
                 $.ajax({
                     url: 'http://localhost/api/register' + queryString,
                     type: 'POST',
@@ -212,7 +239,10 @@ window.onload = function () {
                         dia: dayInput,
                         mes: monthInput,
                         ano: yearInput,
-                        genero: genderInput
+                        genero: genderInput,
+                        tipoPessoa: tipoPessoa,
+                        cpf: cpfInput,
+                        cnpj: cnpjInput
                     },
                     dataType: 'json',
                     success: function (response) {
