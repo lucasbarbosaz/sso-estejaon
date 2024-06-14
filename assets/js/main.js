@@ -212,21 +212,25 @@ window.onload = function () {
 
 
 
-                const nameInput = document.getElementById('name').value;
-                const surnameInput = document.getElementById('apelido').value;
-                const emailInput = document.getElementById('email_usuario').value;
-                const phoneInput = document.getElementById('telefone').value;
-                const emailSecondaryInput = document.getElementById('email-secundario').value;
-                const passwordInput = document.getElementById('senha-registro').value;
-                const passwordRepeatInput = document.getElementById('conf-senha').value;
-                const dayInput = document.getElementById('birthdaydia').value;
-                const monthInput = document.getElementById('birthdaymes').value;
-                const yearInput = document.getElementById('birthdayano').value;
-                const genderInput = document.getElementById('gender').value;
-                const tipoPessoa = document.getElementById('tipoPessoa').value;
-                const cpfInput = document.getElementById('cpf').value;
-                const cnpjInput = document.getElementById('cnpj').value;
-                const hcaptchaVal = $('[name=h-captcha-response]').val();
+                let nameInput = document.getElementById('name').value;
+                let surnameInput = document.getElementById('apelido').value;
+                let emailInput = document.getElementById('email_usuario').value;
+                let phoneInput = document.getElementById('telefone').value;
+                let emailSecondaryInput = document.getElementById('email-secundario').value;
+                let passwordInput = document.getElementById('senha-registro').value;
+                let passwordRepeatInput = document.getElementById('conf-senha').value;
+                let dayInput = document.getElementById('birthdaydia').value;
+                let monthInput = document.getElementById('birthdaymes').value;
+                let yearInput = document.getElementById('birthdayano').value;
+                let genderInput = document.getElementById('gender').value;
+                let tipoPessoa = document.getElementById('tipoPessoa').value;
+                let cpfInput = document.getElementById('cpf').value;
+                let cnpjInput = document.getElementById('cnpj').value;
+                let razaoSocialInput = document.getElementById('razao_social').value;
+                let descricaoEmpresaInput = document.getElementById('descricao_empresa').value;
+
+                let hcaptchaVal = $('[name=h-captcha-response]').val();
+
                 
                 $.ajax({
                     url: 'http://localhost/api/register' + queryString,
@@ -246,6 +250,8 @@ window.onload = function () {
                         tipoPessoa: tipoPessoa,
                         cpf: cpfInput,
                         cnpj: cnpjInput,
+                        razao_social: razaoSocialInput,
+                        descricao_empresa: descricaoEmpresaInput,
                         captcha: hcaptchaVal
                     },
                     dataType: 'json',
@@ -390,6 +396,7 @@ window.onload = function () {
         document.getElementById('nextForgot').addEventListener('click', function () {
             var emailInput = document.getElementById('email').value;
             var errorEmail = document.getElementById('errorEmail');
+            let hcaptchaVal = $('[name=h-captcha-response]').val();
 
             if (!emailValidado) {
                 if (emailInput.trim() !== '') {
@@ -398,7 +405,8 @@ window.onload = function () {
                         type: 'POST',
                         data: {
                             type: 'enviaremail',
-                            email: emailInput
+                            email: emailInput,
+                            captcha: hcaptchaVal
                         },
                         dataType: 'json',
                         success: function (response) {
@@ -441,6 +449,7 @@ window.onload = function () {
 
             var senhaInput = document.getElementById('passwordForgot').value;
             var senhaInput2 = document.getElementById('passwordForgot2').value;
+            let hcaptchaVal = $('[name=h-captcha-response]').val();
 
             let pathname = window.location.pathname;
             let parts = pathname.split('/');
@@ -454,7 +463,8 @@ window.onload = function () {
                         type: 'redefinirsenha',
                         key: key,
                         senha: senhaInput,
-                        senha2: senhaInput2
+                        senha2: senhaInput2,
+                        captcha: hcaptchaVal
 
                     },
                     dataType: 'json',
