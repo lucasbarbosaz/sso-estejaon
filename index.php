@@ -20,6 +20,7 @@ if (isset($_GET['redirect_url'])) {
                 $source = parse_url($appUrl);
             }
 
+
             if (isset($source['host'])) {
                 $scheme = isset($source['scheme']) ? $source['scheme'] : 'http';
                 $host = $source['host'];

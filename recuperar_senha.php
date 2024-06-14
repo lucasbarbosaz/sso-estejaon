@@ -64,6 +64,12 @@ if (extract($_GET)) {
 							<!-- Validation -->
 							<div id="errorSenha2" class="select-none hidden text-red-500 font-medium text-[13px] px-1 my-1">Você precisa digitar um e-mail válido!</div>
 						</div>
+						<?php
+							if($hCaptcha["ativado"]) { ?>
+						?>
+						</br>
+						<div class="h-captcha" data-sitekey="<?= $hCaptcha['site_key'] ?>"></div>
+						<?php } ?>
 						<div class="flex gap-3 justify-end mt-8 pt-1.5">
 							<button type="button" id="recuperasenha" class="select-none text-[14px] px-4 w-fit bg-[#000131] text-white p-2 rounded-full font-medium border !border-[#000131] hover:bg-white hover:!text-[#000131] transition delay-75 duration-75">Seguinte</button>
 						</div>
