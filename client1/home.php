@@ -30,6 +30,7 @@
                 unset($_SESSION['token']);
             }
         } else {
+            unset($_SESSION['token']);
             header("Location: index.php");
         }
         
