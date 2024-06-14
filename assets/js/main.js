@@ -96,6 +96,8 @@ window.onload = function () {
                 var senhaInput = document.getElementById('senha-login').value;
                 var errorSenha = document.getElementById('errorSenha-login');
 
+                var hcaptchaVal = $('[name=h-captcha-response]').val();
+
                 if (senhaInput.trim() !== '') {
                     $.ajax({
                         url: 'http://localhost/api/login_p' + queryString,
@@ -103,7 +105,8 @@ window.onload = function () {
                         data: {
                             type: 'senha',
                             email: emailInput,
-                            senha: senhaInput
+                            senha: senhaInput,
+                            captcha: hcaptchaVal
                         },
                         dataType: 'json',
                         success: function (response) {
@@ -223,7 +226,7 @@ window.onload = function () {
                 const tipoPessoa = document.getElementById('tipoPessoa').value;
                 const cpfInput = document.getElementById('cpf').value;
                 const cnpjInput = document.getElementById('cnpj').value;
-                
+                const hcaptchaVal = $('[name=h-captcha-response]').val();
                 
                 $.ajax({
                     url: 'http://localhost/api/register' + queryString,
@@ -242,7 +245,8 @@ window.onload = function () {
                         genero: genderInput,
                         tipoPessoa: tipoPessoa,
                         cpf: cpfInput,
-                        cnpj: cnpjInput
+                        cnpj: cnpjInput,
+                        captcha: hcaptchaVal
                     },
                     dataType: 'json',
                     success: function (response) {
@@ -333,6 +337,12 @@ window.onload = function () {
                                         errorGenero.textContent = "" + response.message + "";
                                         errorGenero.classList.remove('hidden');
                                         break;
+                                    case 'errorCaptcha':
+                                        const errorCaptcha = document.getElementById('errorCaptcha');
+                                        errorCaptcha.textContent = "" + response.message + "";
+                                        errorCaptcha.classList.remove('hidden');
+                                        break;
+
                                     case 'url_blocked':
                                         $.ajax({
                                             url: 'http://localhost/api/security?redirect_blocked=' + response.url + "",

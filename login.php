@@ -119,8 +119,10 @@ if (isset($_GET['params'])) {
             <!-- Validation -->
 
             <div id="errorSenha-login" class="select-none hidden text-red-500 font-medium text-[13px] px-1 my-1"></div>
+            <br />
 
-
+            <div class="h-captcha" data-sitekey="<?= $hCaptcha['site_key'] ?>"></div>
+            
           </div>
           <div class="flex flex-col px-1 my-2">
             <a href="/esqueceu.php" id="sjw0"
@@ -332,6 +334,9 @@ if (isset($_GET['params'])) {
               </div>
             </div>
 
+            <div class="h-captcha" data-sitekey="<?= $hCaptcha['site_key'] ?>"></div>
+            <div id="errorCaptcha" class="hidden select-none text-red-500 font-medium text-[13px] px-1 my-1">teste</div>
+
             <button type="button" id="concluirBtn"
               class="select-none text-[14px] px-4 w-fit bg-[#000131] text-white p-2 rounded-full font-medium border !border-[#000131] hover:bg-white hover:!text-[#000131] transition delay-75 duration-75 float-right right-0">Concluir</button>
           </div>
@@ -348,7 +353,7 @@ if (isset($_GET['params'])) {
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
   <script src="/assets/js/main.js?v<?= time(); ?>"></script>
-
+  <script src="https://hcaptcha.com/1/api.js" async defer></script>
   <script>
 
     document.addEventListener("DOMContentLoaded", function () {
