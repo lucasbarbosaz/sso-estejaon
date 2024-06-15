@@ -1,9 +1,9 @@
 <?php
 	class Database {
-		private $hostname = "localhost";
-		private $database = "sso_db";
-		private $username = "root";
-		private $password = "";
+		private $hostname = "158.69.144.133";
+		private $database = "estejaon";
+		private $username = "estejaon_user";
+		private $password = "kMn705Cbzg58";
 
 		public static $pdo = null;
 		

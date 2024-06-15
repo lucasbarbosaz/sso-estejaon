@@ -2,8 +2,8 @@
 
 /* configurações da EstejaON */
 $site["nome"] = "EstejaON";
-$site["url"] = "http://localhost"; //sem / no final
-$site["url_login"] = "http://localhost/login";
+$site["url"] = "https://accounts.estejaon.com.br"; //sem / no final
+$site["url_login"] = $site["url"] . "/login";
 $site["max_tentativa_login"] = 5;
 $site["tempo_bloqueio_login"] = 300; //5 minutos
 

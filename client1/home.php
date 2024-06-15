@@ -18,7 +18,7 @@
 
 
     if (isset($_SESSION['token'])) {
-        $url = "http://localhost/get_token.php?token=".$_SESSION['token'];
+        $url = "https://accounts.estejaon.com.br/get_token.php?token=".$_SESSION['token'];
 
         $resp = json_decode($Functions::requestData($url, 'GET'));
 
