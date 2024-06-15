@@ -11,8 +11,8 @@ $site["tempo_bloqueio_login"] = 300; //5 minutos
 $ssoConfig["jwt_secretkey"] = "#axPksmXajLPi%uAxaEw%xPçVvDohS"; //nosso token (n compartilhar)
 
 //hCaptcha configurações
-$hCaptcha["ativado"] = false;
-$hCaptcha["site_key"] = "09d20fd6-1838-4cd6-80fa-9d6a0ce49484";
+$hCaptcha["ativado"] = true;
+$hCaptcha["site_key"] = "dd249046-480e-41c4-abbe-20b42cae948a";
 $hCaptcha["secret_key"] = "ES_12ee3e12a9d24a30b51d45f5b0c46e87";
 
 /* configurações do envio de emails */
