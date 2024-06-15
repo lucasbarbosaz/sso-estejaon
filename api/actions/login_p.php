@@ -60,132 +60,37 @@ if (extract(($_POST))) {
             exit;
         } else {
 
-            if ($hCaptcha["ativado"]) {
-                if (empty($captcha) || $captcha == null || $captcha == '') {
-                    $response['error'] = true;
-                    $response["back"] = false;
-                    $response['message'] = "Precisamos saber que você não é um robô! Verifique o teste abaixo";
-                    echo json_encode($response);
-                    exit;
-                }
+            $obter_senha = $db->prepare("SELECT senha FROM usuarios WHERE email = ?");
+            $obter_senha->bindValue(1, $email);
+            $obter_senha->execute();
+            $obter_senha = $obter_senha->fetch(PDO::FETCH_ASSOC);
 
-                $obter_senha = $db->prepare("SELECT senha FROM usuarios WHERE email = ?");
-                $obter_senha->bindValue(1, $email);
-                $obter_senha->execute();
-                $obter_senha = $obter_senha->fetch(PDO::FETCH_ASSOC);
+            if (password_verify($senha, $obter_senha['senha'])) {
 
-                if (password_verify($senha, $obter_senha['senha'])) {
-                    $hcaptchaData = isset($_POST['captcha']) ? $_POST['captcha'] : '';
 
-                    if ($hcaptchaData) {
-                        $dataCaptcha = array(
-                            'secret' => $hCaptcha["secret_key"],
-                            'response' => $_POST['captcha']
-                        );
+                $obter_usuario = $db->prepare("SELECT * FROM usuarios WHERE email = ?");
+                $obter_usuario->bindValue(1, $email);
+                $obter_usuario->execute();
+                $obter_usuario = $obter_usuario->fetch(PDO::FETCH_ASSOC);
 
-                        $verificarhCaptcha = curl_init();
+                if (isset($_GET['redirect_url'])) {
+                    $appUrl = $_GET['redirect_url'];
 
-                        curl_setopt($verificarhCaptcha, CURLOPT_URL, "https://hcaptcha.com/siteverify");
-                        curl_setopt($verificarhCaptcha, CURLOPT_POST, true);
-                        curl_setopt($verificarhCaptcha, CURLOPT_POSTFIELDS, http_build_query($dataCaptcha));
-                        curl_setopt($verificarhCaptcha, CURLOPT_RETURNTRANSFER, true);
-                        $responsehCaptcha = curl_exec($verificarhCaptcha);
 
-                        $responseData = json_decode($responsehCaptcha);
+                    $obterSitesPermitidos = $db->prepare("SELECT url FROM host");
+                    $obterSitesPermitidos->execute();
+                    $urlsPermitidas = $obterSitesPermitidos->fetchAll(PDO::FETCH_COLUMN);
 
-                        if ($responseData->success == false) {
-                            $response['error'] = true;
-                            $response["back"] = false;
-                            $response['message'] = "Precisamos saber que você não é um robô! Verifique o teste abaixo";
-                            echo json_encode($response);
-                            exit;
+                    $obterHost = $Functions::getHostFromUrl($appUrl); //remover o path e o scheme
+
+                    if (in_array($obterHost, $urlsPermitidas)) {
+                        if (substr($appUrl, 0, 7) != "http://" && substr($appUrl, 0, 8) != "https://") {
+                            $source = parse_url("https://" . $appUrl);
+                        } else {
+                            $source = parse_url($appUrl);
                         }
 
-                        $obter_usuario = $db->prepare("SELECT * FROM usuarios WHERE email = ?");
-                        $obter_usuario->bindValue(1, $email);
-                        $obter_usuario->execute();
-                        $obter_usuario = $obter_usuario->fetch(PDO::FETCH_ASSOC);
-
-                        if (isset($_GET['redirect_url'])) {
-                            $appUrl = $_GET['redirect_url'];
-
-
-                            $obterSitesPermitidos = $db->prepare("SELECT url FROM host");
-                            $obterSitesPermitidos->execute();
-                            $urlsPermitidas = $obterSitesPermitidos->fetchAll(PDO::FETCH_COLUMN);
-
-                            $obterHost = $Functions::getHostFromUrl($appUrl); //remover o path e o scheme
-
-                            if (in_array($obterHost, $urlsPermitidas)) {
-                                if (substr($appUrl, 0, 4) != "http") {
-                                    $source = parse_url("http://" . $appUrl);
-                                } else {
-                                    $source = parse_url($appUrl);
-                                }
-
-                                if (isset($source['host'])) {
-                                    $header = [
-                                        'alg' => 'HS256',
-                                        'typ' => 'JWT'
-                                    ];
-
-                                    $payload = [
-                                        'iat' => time(),
-                                        'exp' => time() + (30 * 24 * 60 * 60), // expira em 30 dias
-                                        'sub' => $obter_usuario['id']
-                                    ];
-
-                                    $token = $JWT::generateJWT($header, $payload);
-
-                                    $scheme = isset($source['scheme']) ? $source['scheme'] : 'http';
-                                    $host = $source['host'];
-                                    $path = isset($source['path']) ? $source['path'] : '';
-
-                                    $target = $scheme . '://' . $host . $path;
-
-                                    $atualiza_ip = $db->prepare("UPDATE usuarios SET ultimo_ip = ? WHERE id = ?");
-                                    $atualiza_ip->bindValue(1, $Functions::IP());
-                                    $atualiza_ip->bindValue(2, $obter_usuario['id']);
-                                    $atualiza_ip->execute();
-
-                                    $removeTokenAntigo = $db->prepare("SELECT * FROM token WHERE usuario_id = ?");
-                                    $removeTokenAntigo->bindValue(1, $obter_usuario['id']);
-                                    $removeTokenAntigo->execute();
-
-                                    if ($removeTokenAntigo->rowCount() > 0) {
-                                        $removeTokenAntigo = $removeTokenAntigo->fetch(PDO::FETCH_ASSOC);
-                                        $delete = $db->prepare("DELETE FROM token WHERE access_token = ?");
-                                        $delete->bindValue(1, $removeTokenAntigo['access_token']);
-                                        $delete->execute();
-                                    }
-
-                                    $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
-                                    $salvarToken->bindValue(1, $token);
-                                    $salvarToken->bindValue(2, $obter_usuario['id']);
-                                    $salvarToken->execute();
-
-                                    $_SESSION['token'] = $token;
-                                    $_SESSION['id'] = $obter_usuario['id'];
-                                    $_SESSION['senha'] = $obter_usuario['senha'];
-
-                                    redefinirTentativas();
-
-                                    $response['success'] = true;
-                                    $response['redirect'] = true;
-                                    $response['location'] = $target . '?token=' . $token;
-                                    echo json_encode($response);
-                                }
-                            } else {
-                                registrarTentativaFalha();
-
-                                $response['error'] = true;
-                                $response['url'] = "$obterHost";
-                                $response['type'] = 'url_blocked';
-                                echo json_encode($response);
-                                exit;
-                            }
-                        } else {
-
+                        if (isset($source['host'])) {
                             $header = [
                                 'alg' => 'HS256',
                                 'typ' => 'JWT'
@@ -198,6 +103,12 @@ if (extract(($_POST))) {
                             ];
 
                             $token = $JWT::generateJWT($header, $payload);
+
+                            $scheme = isset($source['scheme']) ? $source['scheme'] : 'http';
+                            $host = $source['host'];
+                            $path = isset($source['path']) ? $source['path'] : '';
+
+                            $target = $scheme . '://' . $host . $path;
 
                             $atualiza_ip = $db->prepare("UPDATE usuarios SET ultimo_ip = ? WHERE id = ?");
                             $atualiza_ip->bindValue(1, $Functions::IP());
@@ -227,173 +138,73 @@ if (extract(($_POST))) {
                             redefinirTentativas();
 
                             $response['success'] = true;
+                            $response['redirect'] = true;
+                            $response['location'] = $target . '?token=' . $token;
                             echo json_encode($response);
                         }
                     } else {
+                        registrarTentativaFalha();
+
                         $response['error'] = true;
-                        $response["back"] = false;
-                        $response['message'] = "Precisamos saber que você não é um robô! Verifique o teste abaixo";
+                        $response['url'] = "$obterHost";
+                        $response['type'] = 'url_blocked';
                         echo json_encode($response);
                         exit;
                     }
                 } else {
 
-                    registrarTentativaFalha();
+                    $header = [
+                        'alg' => 'HS256',
+                        'typ' => 'JWT'
+                    ];
 
-                    $response["error"] = true;
-                    $response['back'] = true;
-                    $response["message"] = "E-mail ou senha incorretos";
-                    $response["input_error"] = "senha-login";
+                    $payload = [
+                        'iat' => time(),
+                        'exp' => time() + (30 * 24 * 60 * 60), // expira em 30 dias
+                        'sub' => $obter_usuario['id']
+                    ];
+
+                    $token = $JWT::generateJWT($header, $payload);
+
+                    $atualiza_ip = $db->prepare("UPDATE usuarios SET ultimo_ip = ? WHERE id = ?");
+                    $atualiza_ip->bindValue(1, $Functions::IP());
+                    $atualiza_ip->bindValue(2, $obter_usuario['id']);
+                    $atualiza_ip->execute();
+
+                    $removeTokenAntigo = $db->prepare("SELECT * FROM token WHERE usuario_id = ?");
+                    $removeTokenAntigo->bindValue(1, $obter_usuario['id']);
+                    $removeTokenAntigo->execute();
+
+                    if ($removeTokenAntigo->rowCount() > 0) {
+                        $removeTokenAntigo = $removeTokenAntigo->fetch(PDO::FETCH_ASSOC);
+                        $delete = $db->prepare("DELETE FROM token WHERE access_token = ?");
+                        $delete->bindValue(1, $removeTokenAntigo['access_token']);
+                        $delete->execute();
+                    }
+
+                    $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
+                    $salvarToken->bindValue(1, $token);
+                    $salvarToken->bindValue(2, $obter_usuario['id']);
+                    $salvarToken->execute();
+
+                    $_SESSION['token'] = $token;
+                    $_SESSION['id'] = $obter_usuario['id'];
+                    $_SESSION['senha'] = $obter_usuario['senha'];
+
+                    redefinirTentativas();
+
+                    $response['success'] = true;
                     echo json_encode($response);
-                    exit;
                 }
             } else {
-                $obter_senha = $db->prepare("SELECT senha FROM usuarios WHERE email = ?");
-                $obter_senha->bindValue(1, $email);
-                $obter_senha->execute();
-                $obter_senha = $obter_senha->fetch(PDO::FETCH_ASSOC);
+                registrarTentativaFalha();
 
-                if (password_verify($senha, $obter_senha['senha'])) {
-
-
-                    $obter_usuario = $db->prepare("SELECT * FROM usuarios WHERE email = ?");
-                    $obter_usuario->bindValue(1, $email);
-                    $obter_usuario->execute();
-                    $obter_usuario = $obter_usuario->fetch(PDO::FETCH_ASSOC);
-
-                    if (isset($_GET['redirect_url'])) {
-                        $appUrl = $_GET['redirect_url'];
-
-
-                        $obterSitesPermitidos = $db->prepare("SELECT url FROM host");
-                        $obterSitesPermitidos->execute();
-                        $urlsPermitidas = $obterSitesPermitidos->fetchAll(PDO::FETCH_COLUMN);
-
-                        $obterHost = $Functions::getHostFromUrl($appUrl); //remover o path e o scheme
-
-                        if (in_array($obterHost, $urlsPermitidas)) {
-                            if (substr($appUrl, 0, 4) != "http") {
-                                $source = parse_url("http://" . $appUrl);
-                            } else {
-                                $source = parse_url($appUrl);
-                            }
-
-                            if (isset($source['host'])) {
-                                $header = [
-                                    'alg' => 'HS256',
-                                    'typ' => 'JWT'
-                                ];
-
-                                $payload = [
-                                    'iat' => time(),
-                                    'exp' => time() + (30 * 24 * 60 * 60), // expira em 30 dias
-                                    'sub' => $obter_usuario['id']
-                                ];
-
-                                $token = $JWT::generateJWT($header, $payload);
-
-                                $scheme = isset($source['scheme']) ? $source['scheme'] : 'http';
-                                $host = $source['host'];
-                                $path = isset($source['path']) ? $source['path'] : '';
-
-                                $target = $scheme . '://' . $host . $path;
-
-                                $atualiza_ip = $db->prepare("UPDATE usuarios SET ultimo_ip = ? WHERE id = ?");
-                                $atualiza_ip->bindValue(1, $Functions::IP());
-                                $atualiza_ip->bindValue(2, $obter_usuario['id']);
-                                $atualiza_ip->execute();
-
-                                $removeTokenAntigo = $db->prepare("SELECT * FROM token WHERE usuario_id = ?");
-                                $removeTokenAntigo->bindValue(1, $obter_usuario['id']);
-                                $removeTokenAntigo->execute();
-
-                                if ($removeTokenAntigo->rowCount() > 0) {
-                                    $removeTokenAntigo = $removeTokenAntigo->fetch(PDO::FETCH_ASSOC);
-                                    $delete = $db->prepare("DELETE FROM token WHERE access_token = ?");
-                                    $delete->bindValue(1, $removeTokenAntigo['access_token']);
-                                    $delete->execute();
-                                }
-
-                                $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
-                                $salvarToken->bindValue(1, $token);
-                                $salvarToken->bindValue(2, $obter_usuario['id']);
-                                $salvarToken->execute();
-
-                                $_SESSION['token'] = $token;
-                                $_SESSION['id'] = $obter_usuario['id'];
-                                $_SESSION['senha'] = $obter_usuario['senha'];
-
-                                redefinirTentativas();
-
-                                $response['success'] = true;
-                                $response['redirect'] = true;
-                                $response['location'] = $target . '?token=' . $token;
-                                echo json_encode($response);
-                            }
-                        } else {
-                            registrarTentativaFalha();
-
-                            $response['error'] = true;
-                            $response['url'] = "$obterHost";
-                            $response['type'] = 'url_blocked';
-                            echo json_encode($response);
-                            exit;
-                        }
-                    } else {
-
-                        $header = [
-                            'alg' => 'HS256',
-                            'typ' => 'JWT'
-                        ];
-
-                        $payload = [
-                            'iat' => time(),
-                            'exp' => time() + (30 * 24 * 60 * 60), // expira em 30 dias
-                            'sub' => $obter_usuario['id']
-                        ];
-
-                        $token = $JWT::generateJWT($header, $payload);
-
-                        $atualiza_ip = $db->prepare("UPDATE usuarios SET ultimo_ip = ? WHERE id = ?");
-                        $atualiza_ip->bindValue(1, $Functions::IP());
-                        $atualiza_ip->bindValue(2, $obter_usuario['id']);
-                        $atualiza_ip->execute();
-
-                        $removeTokenAntigo = $db->prepare("SELECT * FROM token WHERE usuario_id = ?");
-                        $removeTokenAntigo->bindValue(1, $obter_usuario['id']);
-                        $removeTokenAntigo->execute();
-
-                        if ($removeTokenAntigo->rowCount() > 0) {
-                            $removeTokenAntigo = $removeTokenAntigo->fetch(PDO::FETCH_ASSOC);
-                            $delete = $db->prepare("DELETE FROM token WHERE access_token = ?");
-                            $delete->bindValue(1, $removeTokenAntigo['access_token']);
-                            $delete->execute();
-                        }
-
-                        $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
-                        $salvarToken->bindValue(1, $token);
-                        $salvarToken->bindValue(2, $obter_usuario['id']);
-                        $salvarToken->execute();
-
-                        $_SESSION['token'] = $token;
-                        $_SESSION['id'] = $obter_usuario['id'];
-                        $_SESSION['senha'] = $obter_usuario['senha'];
-
-                        redefinirTentativas();
-
-                        $response['success'] = true;
-                        echo json_encode($response);
-                    }
-                } else {
-                    registrarTentativaFalha();
-
-                    $response["error"] = true;
-                    $response['back'] = true;
-                    $response["message"] = "E-mail ou senha incorretos";
-                    $response["input_error"] = "senha-login";
-                    echo json_encode($response);
-                    exit;
-                }
+                $response["error"] = true;
+                $response['back'] = true;
+                $response["message"] = "E-mail ou senha incorretos";
+                $response["input_error"] = "senha-login";
+                echo json_encode($response);
+                exit;
             }
         }
     }

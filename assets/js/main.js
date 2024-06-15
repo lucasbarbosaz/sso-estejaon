@@ -229,7 +229,7 @@ window.onload = function () {
                 let razaoSocialInput = document.getElementById('razao_social').value;
                 let descricaoEmpresaInput = document.getElementById('descricao_empresa').value;
 
-                let hcaptchaVal = $('[name=h-captcha-response]').val();
+                var hcaptchaVal = $('[name=h-captcha-response]').val();
 
                 
                 $.ajax({
@@ -396,7 +396,7 @@ window.onload = function () {
         document.getElementById('nextForgot').addEventListener('click', function () {
             var emailInput = document.getElementById('email').value;
             var errorEmail = document.getElementById('errorEmail');
-            let hcaptchaVal = $('[name=h-captcha-response]').val();
+            var hcaptchaVal = $('[name=h-captcha-response]').val();
 
             if (!emailValidado) {
                 if (emailInput.trim() !== '') {
@@ -449,7 +449,7 @@ window.onload = function () {
 
             var senhaInput = document.getElementById('passwordForgot').value;
             var senhaInput2 = document.getElementById('passwordForgot2').value;
-            let hcaptchaVal = $('[name=h-captcha-response]').val();
+            var hcaptchaVal = $('[name=h-captcha-response]').val();
 
             let pathname = window.location.pathname;
             let parts = pathname.split('/');

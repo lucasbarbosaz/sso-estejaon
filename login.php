@@ -104,7 +104,6 @@ if (isset($_GET['params'])) {
             <div id="errorSenha-login" class="select-none hidden text-red-500 font-medium text-[13px] px-1 my-1"></div>
             <br />
 
-            <div class="h-captcha" data-sitekey="<?= $hCaptcha['site_key'] ?>"></div>
 
           </div>
           <div class="flex flex-col px-1 my-2">
