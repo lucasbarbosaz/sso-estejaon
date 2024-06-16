@@ -2,7 +2,7 @@
 
     require_once(__DIR__ . "/geral.php");
 
-    function obterTokenCliente($token) {
+    function obterTokenCliente($token, $siteUrl) {
         global $db;
         global $JWT;
 
@@ -30,14 +30,35 @@
 
             if ($obterUsuario !== null ) {
 
-                $usuario_data = array(
-                    'id' => intval($obterUsuario['id']),
-                    'nome' => $obterUsuario['nome'],
-                    'apelido' => $obterUsuario['apelido'],
-                    'email' => $obterUsuario['email'],
-                    'email_secundario' => $obterUsuario['email_secundario'],
-                    'telefone' => $obterUsuario['telefone']
-                );
+                //verificar qual dos nossos sites é para retornar o usuario_data correto
+                if (isset($siteUrl) ) {
+                    if ($siteUrl == "127.0.0.2") {
+                        $usuario_data = array(
+                            
+                            'id' => intval($obterUsuario['id']),
+                            'nome' => $obterUsuario['nome'],
+                            'email' => $obterUsuario['email'],
+                            'role_id' => intval($obterUsuario['role_id']),
+                            'role' => "User", //padrao
+                        );
+                    } else {
+                        //padrao
+                        $usuario_data = array(
+                            'id' => intval($obterUsuario['id']),
+                            'nome' => $obterUsuario['nome'],
+                            'apelido' => $obterUsuario['apelido'],
+                            'email' => $obterUsuario['email'],
+                            'email_secundario' => $obterUsuario['email_secundario'],
+                            'telefone' => $obterUsuario['telefone']
+                        );
+                    }
+                } else {
+                    echo json_encode(array(
+                        'status_code' => 400,
+                        'msg' => "Invalid"
+                    ));
+                    return;
+                }
             }
         }
 
@@ -48,12 +69,13 @@
     }
 
     if (!empty($_GET['token'])) {
-        echo obterTokenCliente($_GET['token']);
+        echo obterTokenCliente($_GET['token'], $_GET['site']);
     } else {
         echo json_encode(array(
-            'code' => 400,
+            'status_code' => 400,
             'msg' => "Invalid"
         ));
+        return;
     }
 
 ?>
