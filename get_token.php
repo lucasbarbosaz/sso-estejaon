@@ -32,7 +32,7 @@
 
                 //verificar qual dos nossos sites é para retornar o usuario_data correto
                 if (isset($siteUrl) ) {
-                    if ($siteUrl == "127.0.0.2") {
+                    if ($siteUrl == "dicasdaqui.com") {
                         $usuario_data = array(
                             
                             'id' => intval($obterUsuario['id']),
