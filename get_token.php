@@ -39,7 +39,7 @@
                             'nome' => $obterUsuario['nome'],
                             'email' => $obterUsuario['email'],
                             'role_id' => intval($obterUsuario['role_id']),
-                            'role' => "User", //padrao
+                            'role' => $obterUsuario['role'], //padrao
                         );
                     } else {
                         //padrao
