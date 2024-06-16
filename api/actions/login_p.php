@@ -85,7 +85,7 @@ if (extract(($_POST))) {
 
                     if (in_array($obterHost, $urlsPermitidas)) {
                         if (substr($appUrl, 0, 7) != "http://" && substr($appUrl, 0, 8) != "https://") {
-                            $source = parse_url("http://" . $appUrl);
+                            $source = parse_url("https://" . $appUrl);
                         } else {
                             $source = parse_url($appUrl);
                         }
