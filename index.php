@@ -15,7 +15,7 @@ if (isset($_GET['redirect_url'])) {
 
         if (in_array($obterHost, $urlsPermitidas)) {
             if (substr($appUrl, 0, 7) != "http://" && substr($appUrl, 0, 8) != "https://") {
-                $source = parse_url("https://" . $appUrl);
+                $source = parse_url("http://" . $appUrl);
             } else {
                 $source = parse_url($appUrl);
             }
