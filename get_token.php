@@ -32,14 +32,24 @@
 
                 //verificar qual dos nossos sites é para retornar o usuario_data correto
                 if (isset($siteUrl) ) {
-                    if ($siteUrl == "dicasdaqui.com") {
+                    if ($siteUrl == "127.0.0.2") {
+                        //faça buscar a profile_data e salvar na array
+                        $obterPerfil = $db->prepare("SELECT * FROM usuario_perfis WHERE usuario_id = ? AND site_id = ?");
+                        $obterPerfil->bindValue(1, $obterUsuario['id']);
+                        $obterPerfil->bindValue(2, 1);
+                        $obterPerfil->execute();
+                        $obterPerfil = $obterPerfil->rowCount() > 0 ? $obterPerfil->fetch(PDO::FETCH_ASSOC) : null;
+
                         $usuario_data = array(
                             
                             'id' => intval($obterUsuario['id']),
                             'nome' => $obterUsuario['nome'],
                             'email' => $obterUsuario['email'],
+                            'senha' => $obterUsuario['senha'],
+                            'telefone' => $obterUsuario['telefone'],
                             'role_id' => intval($obterUsuario['role_id']),
                             'role' => $obterUsuario['role'], //padrao
+                            'profile_data' => json_decode($obterPerfil['profile_data'])
                         );
                     } else {
                         //padrao
