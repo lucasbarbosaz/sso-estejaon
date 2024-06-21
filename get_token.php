@@ -40,6 +40,7 @@
                         $obterPerfil->execute();
                         $obterPerfil = $obterPerfil->rowCount() > 0 ? $obterPerfil->fetch(PDO::FETCH_ASSOC) : null;
 
+                        
                         $usuario_data = array(
                             
                             'id' => intval($obterUsuario['id']),
@@ -49,7 +50,7 @@
                             'telefone' => $obterUsuario['telefone'],
                             'role_id' => intval($obterUsuario['role_id']),
                             'role' => $obterUsuario['role'], //padrao
-                            'profile_data' => json_decode($obterPerfil['profile_data'])
+                            'profile_data' => $obterPerfil !== null ? json_decode($obterPerfil['profile_data']) : []
                         );
                     } else {
                         //padrao
