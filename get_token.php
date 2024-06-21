@@ -36,7 +36,7 @@
                         //faça buscar a profile_data e salvar na array
                         $obterPerfil = $db->prepare("SELECT * FROM usuario_perfis WHERE usuario_id = ? AND site_id = ?");
                         $obterPerfil->bindValue(1, $obterUsuario['id']);
-                        $obterPerfil->bindValue(2, 1);
+                        $obterPerfil->bindValue(2, 3);
                         $obterPerfil->execute();
                         $obterPerfil = $obterPerfil->rowCount() > 0 ? $obterPerfil->fetch(PDO::FETCH_ASSOC) : null;
 
