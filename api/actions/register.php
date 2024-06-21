@@ -326,7 +326,7 @@ if (extract($_POST)) {
                                 'sub' => $conta_id
                             ];
 
-                            $token = $JWT::generateJWT($header, $payload);
+                            $token = $JWT::generateJWT($header, $payload, $conta_id);
 
                             $scheme = isset($source['scheme']) ? $source['scheme'] : 'http';
                             $host = $source['host'];
@@ -391,7 +391,7 @@ if (extract($_POST)) {
                         'sub' => $conta_id
                     ];
 
-                    $token = $JWT::generateJWT($header, $payload);
+                    $token = $JWT::generateJWT($header, $payload, $conta_id);
 
                     $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
                     $salvarToken->bindValue(1, $token);
@@ -470,7 +470,7 @@ if (extract($_POST)) {
                             'sub' => $conta_id
                         ];
 
-                        $token = $JWT::generateJWT($header, $payload);
+                        $token = $JWT::generateJWT($header, $payload, $conta_id);
 
                         $scheme = isset($source['scheme']) ? $source['scheme'] : 'http';
                         $host = $source['host'];
@@ -535,7 +535,7 @@ if (extract($_POST)) {
                     'sub' => $conta_id
                 ];
 
-                $token = $JWT::generateJWT($header, $payload);
+                $token = $JWT::generateJWT($header, $payload, $conta_id);
 
                 $salvarToken = $db->prepare("INSERT INTO token (access_token, usuario_id) VALUES(?,?)");
                 $salvarToken->bindValue(1, $token);

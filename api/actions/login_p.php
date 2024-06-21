@@ -102,7 +102,7 @@ if (extract(($_POST))) {
                                 'sub' => $obter_usuario['id']
                             ];
 
-                            $token = $JWT::generateJWT($header, $payload);
+                            $token = $JWT::generateJWT($header, $payload, $obter_usuario['id']);
 
                             $scheme = isset($source['scheme']) ? $source['scheme'] : 'http';
                             $host = $source['host'];
@@ -164,7 +164,7 @@ if (extract(($_POST))) {
                         'sub' => $obter_usuario['id']
                     ];
 
-                    $token = $JWT::generateJWT($header, $payload);
+                    $token = $JWT::generateJWT($header, $payload, $obter_usuario['id']);
 
                     $atualiza_ip = $db->prepare("UPDATE usuarios SET ultimo_ip = ? WHERE id = ?");
                     $atualiza_ip->bindValue(1, $Functions::IP());
