@@ -10,6 +10,10 @@ $site["tempo_bloqueio_login"] = 300; //5 minutos
 //Single Sign-on
 $ssoConfig["jwt_secretkey"] = "#axPksmXajLPi%uAxaEw%xPçVvDohS"; //nosso token (n compartilhar)
 
+//mercadopago
+$mercadopago['public_key'] = "TEST-48cdafe4-8e3d-4cda-95be-fb41ef51f4e1";
+$mercadopago['secret_key'] = "TEST-553454966659450-062619-e11170e12868a533976f6d33771546c7-1499191859";
+
 //hCaptcha configurações
 $hCaptcha["ativado"] = false;
 $hCaptcha["site_key"] = "09d20fd6-1838-4cd6-80fa-9d6a0ce49484";
