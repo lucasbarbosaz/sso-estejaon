@@ -64,4 +64,5 @@ function converterSegundosEmMinutos($segundos)
 
     return sprintf("%d minutos", $minutos);
 }
+
 ?>
