@@ -33,7 +33,7 @@ function obterTokenCliente($token, $siteUrl)
 
             //verificar qual dos nossos sites é para retornar o usuario_data correto
             if (isset($siteUrl)) {
-                if ($siteUrl == "dicasdaqui.com") {
+                if ($siteUrl == "127.0.0.2") {
                     //faça buscar a profile_data e salvar na array
                     $obterPerfil = $db->prepare("SELECT * FROM usuario_perfis WHERE usuario_id = ? AND site_id = ?");
                     $obterPerfil->bindValue(1, $obterUsuario['id']);
