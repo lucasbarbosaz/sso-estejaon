@@ -136,10 +136,12 @@ if (extract(($_POST))) {
                             $_SESSION['senha'] = $obter_usuario['senha'];
 
                             redefinirTentativas();
+							
+							$backUrl = isset($_GET['back_url']) ? $_GET['back_url'] : null;
 
                             $response['success'] = true;
                             $response['redirect'] = true;
-                            $response['location'] = $target . '?token=' . $token;
+                            $response['location'] = $target . '?token=' . $token . "&back_url=$backUrl";
                             echo json_encode($response);
                         }
                     } else {

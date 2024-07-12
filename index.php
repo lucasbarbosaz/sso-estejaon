@@ -28,17 +28,31 @@ if (isset($_GET['redirect_url'])) {
 
                 $target = $scheme . '://' . $host . $path;
 
+				$backUrl = isset($_GET['back_url']) ? $_GET['back_url'] : null;
 
-                Redirect($target . "?token=" . $_SESSION['token']);
+				if ($backUrl) {
+					Redirect($target . "?token=" . $_SESSION['token'] . "&back_url=" . $backUrl);
+				} else {
+					Redirect($target . "?token=" . $_SESSION['token']);
+				}
+                
                 exit;
             }
 
         } else {
+			
             Redirect($site["url_login"]);
             exit;
         }
     } else {
-        Redirect($site["url_login"] . "?redirect_url=" . $appUrl);
+		$backUrl = isset($_GET['back_url']) ? $_GET['back_url'] : null;
+		
+		if ($backUrl) {
+			Redirect($site["url_login"] . "?redirect_url=" . $appUrl . "&back_url=".$backUrl);	
+		} else {
+			Redirect($site["url_login"] . "?redirect_url=" . $appUrl);	
+		}
+        
         exit;
     }
 } else {
