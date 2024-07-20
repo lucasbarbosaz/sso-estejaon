@@ -45,7 +45,7 @@ window.onload = function () {
             if (!emailValidado) {
                 if (emailInput.trim() !== '') {
                     $.ajax({
-                        url: 'https://accounts.estejaon.com.br//api/login_p',
+                        url: 'http://localhost/api/login_p',
                         type: 'POST',
                         data: {
                             type: 'email',
@@ -100,7 +100,7 @@ window.onload = function () {
 
                 if (senhaInput.trim() !== '') {
                     $.ajax({
-                        url: 'https://accounts.estejaon.com.br/api/login_p' + queryString,
+                        url: 'http://localhost/api/login_p' + queryString,
                         type: 'POST',
                         data: {
                             type: 'senha',
@@ -132,7 +132,7 @@ window.onload = function () {
                             if (response.type) {
                                 if (response.type == "url_blocked") {
                                     $.ajax({
-                                        url: 'https://accounts.estejaon.com.br/api/security?redirect_blocked=' + response.url + "",
+                                        url: 'http://localhost/api/security?redirect_blocked=' + response.url + "",
                                         type: 'GET',
                                         dataType: 'json',
                                         success: function (response) {
@@ -233,7 +233,7 @@ window.onload = function () {
 
                 
                 $.ajax({
-                    url: 'https://accounts.estejaon.com.br/api/register' + queryString,
+                    url: 'http://localhost/api/register' + queryString,
                     type: 'POST',
                     data: {
                         nome: nameInput,
@@ -351,7 +351,7 @@ window.onload = function () {
 
                                     case 'url_blocked':
                                         $.ajax({
-                                            url: 'https://accounts.estejaon.com.br/api/security?redirect_blocked=' + response.url + "",
+                                            url: 'http://localhost/api/security?redirect_blocked=' + response.url + "",
                                             type: 'GET',
                                             dataType: 'json',
                                             success: function (response) {
@@ -401,7 +401,7 @@ window.onload = function () {
             if (!emailValidado) {
                 if (emailInput.trim() !== '') {
                     $.ajax({
-                        url: 'https://accounts.estejaon.com.br/api/recuperar_senha',
+                        url: 'http://localhost/api/recuperar_senha',
                         type: 'POST',
                         data: {
                             type: 'enviaremail',
@@ -457,7 +457,7 @@ window.onload = function () {
 
             if (senhaInput.trim() !== '' && senhaInput2.trim() !== '') {
                 $.ajax({
-                    url: 'https://accounts.estejaon.com.br/api/recuperar_senha',
+                    url: 'http://localhost/api/recuperar_senha',
                     type: 'POST',
                     data: {
                         type: 'redefinirsenha',

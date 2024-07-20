@@ -4,59 +4,48 @@ require_once('../../geral.php');
 header('Content-Type: application/json; charset=utf-8');
 
 if ($JWT::checkAuth()) {
-    $usuario_id = $JWT::getUserIdFromToken();
 
     $postData = json_decode(file_get_contents("php://input"));
 
-    $site_id = $postData->site_id;
-    $perfil = $postData->data;
+    $type = $postData->type;
 
-
-    $verificaPerfil = $db->prepare("SELECT * FROM usuario_perfis WHERE usuario_id = ? AND site_id = ?");
-    $verificaPerfil->bindValue(1, $usuario_id);
-    $verificaPerfil->bindValue(2, $site_id);
-    $verificaPerfil->execute();
-
-    if ($verificaPerfil->rowCount() > 0) {
-        $atualizaPerfil = $db->prepare("UPDATE usuario_perfis SET profile_data = ? WHERE usuario_id = ? AND site_id = ?");
-        $atualizaPerfil->bindValue(1, json_encode($perfil));
-        $atualizaPerfil->bindValue(2, $usuario_id);
-        $atualizaPerfil->bindValue(3, $site_id);
-        $atualizaPerfil->execute();
-
-        if ($atualizaPerfil) {
-            $response['success'] = true;
-            $response['message'] = "Perfil atualizado com sucesso!";
-            echo json_encode($response);
-            exit();
-        } else {
-            $response['error'] = true;
-            $response['message'] = "Erro ao atualizar perfil";
-            echo json_encode($response);
-            exit();
-        }
-    } else {
-        $inserirPerfil = $db->prepare("INSERT INTO usuario_perfis (usuario_id, site_id, profile_data) VALUES (?, ?, ?)");
-        $inserirPerfil->bindValue(1, $usuario_id);
-        $inserirPerfil->bindValue(2, $site_id);
-        $inserirPerfil->bindValue(3, json_encode($perfil));
-        $inserirPerfil->execute();
-
-        if ($inserirPerfil) {
-            $response['success'] = true;
-            $response['message'] = "Perfil atualizado com sucesso!";
-            echo json_encode($response);
-            exit();
-        } else {
-            $response['error'] = true;
-            $response['message'] = "Erro ao atualizar perfil";
-            echo json_encode($response);
-            exit();
-        }
+    if ($type == "admin_edit_user") {
+        $usuario_id = $postData->data->id;
+    } else if ($type == "edit_user") {
+        $usuario_id = $JWT::getUserIdFromToken();
     }
-} else {
-    //crie um arquivo com dados recebidos
-    $file = fopen("data.txt", "w");
-    fwrite($file, json_encode("oi"));
-    fclose($file);
+
+    $name = $postData->data->name;
+    $email = $postData->data->email;
+    $phone = $postData->data->phone;
+
+
+    //com os dados abaixo crie um json e coloque dentro da coluna redes_sociais
+
+    $facebook = $postData->data->facebook;
+    $twitter = $postData->data->twitter;
+    $linkedin = $postData->data->linkedin;
+
+    $redes_sociais = array(
+        "facebook" => $facebook,
+        "twitter" => $twitter,
+        "linkedin" => $linkedin
+    );
+
+    $redes_sociais = json_encode($redes_sociais);
+
+    $updateUser = $db->prepare("UPDATE usuarios SET nome = ?, email = ?, telefone = ?, redes_sociais = ?  WHERE id = ?");
+    $updateUser->bindValue(1, $name);
+    $updateUser->bindValue(2, $email);
+    $updateUser->bindValue(3, $phone);
+    $updateUser->bindValue(4, $redes_sociais);
+    $updateUser->bindValue(5, $usuario_id);
+    $updateUser->execute();
+
+    if ($updateUser) {
+        $response['success'] = true;
+        $response['message'] = "Perfil atualizado com sucesso!";
+        echo json_encode($response);
+        exit();
+    }
 }

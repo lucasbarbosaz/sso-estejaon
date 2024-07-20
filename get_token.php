@@ -35,54 +35,16 @@ function obterTokenCliente($token, $siteUrl)
             if (isset($siteUrl)) {
                 if ($siteUrl == "127.0.0.2") {
                     //faça buscar a profile_data e salvar na array
-                    $obterPerfil = $db->prepare("SELECT * FROM usuario_perfis WHERE usuario_id = ? AND site_id = ?");
-                    $obterPerfil->bindValue(1, $obterUsuario['id']);
-                    $obterPerfil->bindValue(2, 1);
-                    $obterPerfil->execute();
-
-                    if ($obterPerfil->rowCount() > 0) {
-                        $obterPerfil = $obterPerfil->fetch(PDO::FETCH_ASSOC);
-
-                        
-                        $usuario_data = array(
-                            'id' => intval($obterUsuario['id']),
-                            'nome' => $obterUsuario['nome'],
-                            'email' => $obterUsuario['email'],
-                            'senha' => $obterUsuario['senha'],
-                            'telefone' => $obterUsuario['telefone'],
-                            'role_id' => intval($obterUsuario['role_id']),
-                            'role' => $obterUsuario['role'], //padrao
-                            'profile_data' => $obterPerfil !== null ? json_decode($obterPerfil['profile_data']) : []
-                        );
-                    } else {
-                        $inserirPerfil = $db->prepare("INSERT INTO usuario_perfis (usuario_id, site_id, profile_data) VALUES (?, ?, ?)");
-                        $inserirPerfil->bindValue(1, $obterUsuario['id']);
-                        $inserirPerfil->bindValue(2, 1);
-                        $inserirPerfil->bindValue(3, json_encode(array(
-                            'address' => '',
-                            'facebook' => '',
-                            'twitter' => '',
-                            'linkedin' => '',
-                        )));
-                        $inserirPerfil->execute();
-
-                        $usuario_data = array(
-                            'id' => intval($obterUsuario['id']),
-                            'nome' => $obterUsuario['nome'],
-                            'email' => $obterUsuario['email'],
-                            'senha' => $obterUsuario['senha'],
-                            'telefone' => $obterUsuario['telefone'],
-                            'role_id' => intval($obterUsuario['role_id']),
-                            'role' => $obterUsuario['role'], //padrao
-                            'profile_data' => array(
-                                'address' => '',
-                                'facebook' => '',
-                                'twitter' => '',
-                                'linkedin' => ''
-                            )
-                        );
-
-                    }
+                    $usuario_data = array(
+                        'id' => intval($obterUsuario['id']),
+                        'nome' => $obterUsuario['nome'],
+                        'email' => $obterUsuario['email'],
+                        'senha' => $obterUsuario['senha'],
+                        'telefone' => $obterUsuario['telefone'],
+                        'redes_sociais' => $obterUsuario['redes_sociais'],
+                        'role_id' => intval($obterUsuario['role_id']),
+                        'role' => $obterUsuario['role'], //padrao
+                    );
                 } else {
                     //padrao
                     $usuario_data = array(
